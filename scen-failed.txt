@@ -1,0 +1,18 @@
+<DIV style="FONT-SIZE: 16px; MAX-WIDTH: 800px; BORDER-TOP: #2c3e50 1px solid; FONT-FAMILY: 'Segoe UI', Arial, sans-serif; BORDER-RIGHT: #2c3e50 1px solid; BACKGROUND: #1e272e; BORDER-BOTTOM: #2c3e50 1px solid; COLOR: #dcdde1; PADDING-BOTTOM: 25px; PADDING-TOP: 25px; PADDING-LEFT: 25px; BORDER-LEFT: #7f8c8d 8px solid; LINE-HEIGHT: 1.6; PADDING-RIGHT: 25px">
+<DIV style="MARGIN-BOTTOM: 25px; BORDER-BOTTOM: #7f8c8d 2px solid; PADDING-BOTTOM: 15px; TEXT-ALIGN: center">
+<H1 style="FONT-SIZE: 24px; TEXT-TRANSFORM: uppercase; FONT-WEIGHT: bold; COLOR: #7f8c8d; MARGIN: 0px; LETTER-SPACING: 1px">SITREP: OPERATIONAL FAILURE REPORT</H1>
+<P style="FONT-SIZE: 18px; COLOR: #a4b0be; FONT-STYLE: italic; MARGIN: 5px 0px 0px">PRIORITY: ROUTINE // ASSESSMENT PHASE</P></DIV>
+<P style="FONT-SIZE: 14px"><B>FROM:</B> HQ FINLAND / STRATEGIC PLANNING CELL</P>
+<P style="FONT-SIZE: 14px"><B>TO:</B> COMMANDER / ALL REGIONAL FORCES</P>
+<P style="FONT-SIZE: 14px"><B>SUBJECT:</B> POST-ACTION ASSESSMENT - OP KOKKO</P>
+<HR style="BORDER-TOP: #57606f 1px solid; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; MARGIN: 20px 0px">
+
+<H2 style="FONT-SIZE: 18px; TEXT-TRANSFORM: uppercase; COLOR: #7f8c8d">1. OPERATIONAL SUMMARY</H2>
+<P style="FONT-SIZE: 17px">The objectives of <B>OP KOKKO</B> have not been met. Adversary formations have successfully breached defensive perimeters, and our attempts to stabilize the front have suffered a catastrophic breakdown in coordination and execution.</P>
+<H2 style="FONT-SIZE: 18px; TEXT-TRANSFORM: uppercase; COLOR: #7f8c8d">2. ATTRITION REPORT</H2>
+<UL style="FONT-SIZE: 17px; PADDING-LEFT: 25px">
+<LI style="MARGIN-BOTTOM: 10px">Combat effectiveness has been severely degraded. Excessive losses in high-value airframes, ships, air defense systems&nbsp;and personnel have left our&nbsp;airspace and seas vulnerable for further attacks.</LI></UL>
+<H2 style="FONT-SIZE: 18px; TEXT-TRANSFORM: uppercase; COLOR: #7f8c8d">3. STRATEGIC OUTLOOK</H2>
+<P style="FONT-SIZE: 17px">Though the conflict is in its opening phase, the current loss-to-kill ratio indicates a <B>unsustainable defensive posture</B>. Future operations are now heavily compromised due to a lack of reserve assets. Survival of the sovereign state is now entirely dependent on immediate and massive <B>NATO intervention</B> and logistics support.</P>
+<DIV style="BORDER-TOP: #7f8c8d 1px solid; BORDER-RIGHT: #7f8c8d 1px solid; BACKGROUND: #2c3e50; MARGIN-TOP: 30px; BORDER-BOTTOM: #7f8c8d 1px solid; FONT-WEIGHT: bold; COLOR: #ffffff; PADDING-BOTTOM: 15px; TEXT-ALIGN: center; PADDING-TOP: 15px; PADDING-LEFT: 15px; BORDER-LEFT: #7f8c8d 1px solid; PADDING-RIGHT: 15px; border-radius: 4px">REORGANIZE REMAINING FORCES. CONSERVE SURVIVING ASSETS AT ALL COSTS. STAND BY FOR POLITICAL MANDATE. </DIV>
+<DIV style="FONT-SIZE: 16px; MARGIN-TOP: 30px; FONT-WEIGHT: bold; COLOR: #7f8c8d; TEXT-ALIGN: right">CHIEF OF DEFENCE / HQ FINLAND<BR>SECRET // ASSESSMENT </DIV></DIV>
