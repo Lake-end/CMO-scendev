@@ -1,0 +1,64 @@
+-- Capture Event Payoff (Triggers only once per zone)
+        local isSecured = ScenEdit_GetKeyValue("ZCTRL_" .. zoneName .. "_SECURED") or "FALSE"
+        if ctrlPct >= 85 and isSecured == "FALSE" then
+            ScenEdit_SetKeyValue("ZCTRL_" .. zoneName .. "_SECURED", "TRUE")
+            
+            -- =========================================================
+            -- BASE HANDOVER LOGIC (Dynamic Area-of-Effect & Hosted Units)
+            -- =========================================================
+            local enemySideName = "Argentina" 
+            local enemySide = VP_GetSide({side=enemySideName})
+            
+            if enemySide ~= nil and #zonePolygon >= 3 then
+                local enemyUnits = enemySide:unitsInArea({Area=zonePolygon})
+                if enemyUnits ~= nil then
+                    for _, u in ipairs(enemyUnits) do
+                        ScenEdit_SetUnitSide({side=unit.side, guid=unit.guid, newside="UK"})
+                        
+                        -- Target Ground Facilities (Airbases, Ports, Ammo Dumps)
+                        if unit ~= nil and unit.type == 'Facility' then
+                            -- 1. Flip the parent facility
+                            ScenEdit_SetUnitSide({guid=unit.guid, newside="UK"})
+                            
+                            -- Flip hosted/embarked units (Aircraft and Boats)
+                            if unit.embarkedUnits ~= nil then
+                                -- Handle Aircraft
+                                if unit.embarkedUnits.Aircraft ~= nil then
+                                    for i = 1, #unit.embarkedUnits.Aircraft do
+                                        local childGuid = unit.embarkedUnits.Aircraft[i]
+                                        ScenEdit_SetUnitSide({side=unit.side, guid=childGuid, newside="UK"})
+                                    end
+                                end
+                                
+                                -- Handle Boats
+                                if unit.embarkedUnits.Boats ~= nil then
+                                    for i = 1, #unit.embarkedUnits.Boats do
+                                        local childGuid = unit.embarkedUnits.Boats[i]
+                                        ScenEdit_SetUnitSide({side=unit.side, guid=childGuid, newside="UK"})
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            
+            -- =========================================================
+            -- MORALE REWARDS
+            -- =========================================================
+            local moraleBoost = 5
+            if zoneName == "ZONE_PLEASANT" or zoneName == "ZONE_STANLEY" then
+                moraleBoost = 10
+            end
+            
+            local newUkMorale = (tonumber(ScenEdit_GetKeyValue("GCE_GLOBAL_UK_MORALE")) or 100) + moraleBoost
+            local newArgMorale = (tonumber(ScenEdit_GetKeyValue("GCE_GLOBAL_ARG_MORALE")) or 100) - moraleBoost
+            if newUkMorale > 100 then newUkMorale = 100 end
+            if newArgMorale < 10 then newArgMorale = 10 end
+            
+            ScenEdit_SetKeyValue("GCE_GLOBAL_UK_MORALE", newUkMorale)
+            ScenEdit_SetKeyValue("GCE_GLOBAL_ARG_MORALE", newArgMorale)
+            
+            local msg = string.format("<b>STRATEGIC VICTORY</b><br>%s has been secured by UK Forces! Global Morale increases by %d%%.<br><br><i>All surviving enemy facilities and their embarked assets in the sector have been captured.</i>", zoneName, moraleBoost)
+            ScenEdit_SpecialMessage("UK", msg)
+        end

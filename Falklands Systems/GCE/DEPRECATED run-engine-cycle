@@ -1,0 +1,74 @@
+-- ==============================================================================
+-- GCE CORE ENGINE LOOP (Run every 1 hour via Event)
+-- ==============================================================================
+
+local GCE_Zones = {
+    "ZONE_SAN_CARLOS",
+    "ZONE_BLUFF_COVE",
+    "ZONE_GOOSE_GREEN",
+    "ZONE_MT_KENT",
+    "ZONE_FALKLAND_SOUND",
+    "ZONE_PORT_HOWARD",
+    "ZONE_FOX_BAY",
+    "ZONE_TEAL_INLET",
+    "ZONE_PEBBLE_ISLAND",
+    "ZONE_STANLEY",
+    "ZONE_PLEASANT"
+}
+
+function GCE_RunEngineCycle()
+    local shiftRateMultiplier = 1.5 -- Adjust this to make control shift faster/slower per hour
+
+    for _, zoneName in ipairs(GCE_Zones) do
+        -- 1. Fetch current metrics
+        local ukPwr = tonumber(ScenEdit_GetKeyValue("ZCTRL_" .. zoneName .. "_UK_PWR")) or 0
+        local argPwr = tonumber(ScenEdit_GetKeyValue("ZCTRL_" .. zoneName .. "_ARG_PWR")) or 0
+        local ctrlPct = tonumber(ScenEdit_GetKeyValue("ZCTRL_" .. zoneName .. "_CTRL_PCT")) or 0
+
+        local localSA = tonumber(ScenEdit_GetKeyValue("ZCTRL_" .. zoneName .. "_SA_LOCAL")) or 1.0
+        local globalSA = tonumber(ScenEdit_GetKeyValue("GCE_GLOBAL_UK_SA_BONUS")) or 1.0
+        local morale = (tonumber(ScenEdit_GetKeyValue("GCE_GLOBAL_UK_MORALE")) or 100) / 100
+
+        -- (Future: Insert logic here to check for CAS or NGFS and modify SA/Power accordingly)
+        local casMod = 1.0
+        local ngfsMod = 1.0
+
+        -- 2. Calculate Effective Combat Power
+        local ukEffective = ukPwr * localSA * globalSA * casMod * ngfsMod * morale
+        local argEffective = argPwr -- (In future, apply ARG multipliers here)
+
+        -- 3. Calculate Shift Delta (Who is winning the tug-of-war?)
+        -- If UK has 150 power and ARG has 100, delta is +50.
+        local powerDelta = ukEffective - argEffective
+
+        -- Convert power delta to a percentage shift.
+        -- e.g., 50 power advantage = +7.5% control shift this hour.
+        local shift = (powerDelta / 10) * shiftRateMultiplier
+
+        -- 4. Apply Shift and Clamp between 0 and 100
+        ctrlPct = ctrlPct + shift
+        if ctrlPct > 100 then ctrlPct = 100 end
+        if ctrlPct < 0 then ctrlPct = 0 end
+
+        -- Save back to KV Store
+        ScenEdit_SetKeyValue("ZCTRL_" .. zoneName .. "_CTRL_PCT", math.floor(ctrlPct))
+
+        -- 5. Update Center Reference Point Name for Visual UI
+        local centerRPName = "RP_" .. zoneName .. "_CENTER"
+        local statusStr = "CONTESTED"
+        if ctrlPct <= 19 then statusStr = "ARG SECURED" end
+        if ctrlPct >= 20 and ctrlPct <= 49 then statusStr = "UK BEACHHEAD" end
+        if ctrlPct >= 85 then statusStr = "UK SECURED" end
+
+        local newLabel = string.format("%s [CTRL: %d%%] - %s", zoneName, math.floor(ctrlPct), statusStr)
+
+        -- Safely attempt to rename the RP
+        pcall(function()
+            ScenEdit_SetReferencePoint({ side = "UK", name = centerRPName, newname = newLabel })
+            -- Overwrite centerRPName variable so next cycle finds it under the new label
+            -- NOTE: To make this robust, it is better to find the RP by GUID or a static part of the name.
+        end)
+
+        -- (Optional) Update Zone Color here if using CMO Zone features
+    end
+end

@@ -1,0 +1,200 @@
+<!--
+=============================================================================
+README: CTFS (Carrier Task Force Selector) - HTML UI Frontend
+=============================================================================
+PURPOSE:
+Provides the player-facing interactive UI to assemble the UK Task Force. 
+Converts player selections into a delay penalty (1 point = 5 hours).
+
+IMPLEMENTED MECHANICS:
+1. Default Fleet (0 pts): Base OOB (Queen Elizabeth, St Albans, etc.) is treated as standard selections but pre-checked and locked to 0 points.
+2. Quantity Spinners: Allows batch purchasing (e.g., up to 10 A400M Atlas aircraft) with dynamic cost calculation (Qty * Pts).
+3. Magazine/VLS Upgrades: Nested checkboxes attached to specific ships. Each tick adds a 25% capacity modifier to the JSON payload.
+4. Dynamic Timeline: Visually tracks the delay against a 100-point (21-day) hard limit, shifting from blue to yellow to red. Base date: Dec 26, 2027.
+5. JSON Payload: Compiles an array of `units` (with quantities and spawn RPs) and a dictionary of `upgrades` (total % to add per ship name).
+
+USAGE:
+Place this file in the scenario's 'Attachments' folder. Trigger it via CMO Lua using:
+ScenEdit_ShowCustomDialog("CTFS: Carrier Task Force Selector", "ctfs_ui.html")
+=============================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CTFS: Carrier Task Force Selector</title>
+    <style>
+        :root { --bg-dark: #121212; --bg-panel: #1e1e1e; --border-color: #333; --text-main: #f0f0f0; --accent-blue: #0078D7; --accent-red: #D32F2F; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); padding: 20px; }
+        .dashboard { background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 25px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; font-weight: bold; margin-bottom: 20px; }
+        .stats-grid span { display: block; font-size: 1.5em; margin-top: 5px; color: var(--accent-blue); }
+        .timeline-track { width: 100%; background: #333; height: 12px; border-radius: 6px; position: relative; }
+        .timeline-fill { height: 100%; background: var(--accent-blue); border-radius: 6px; width: 0%; transition: width 0.3s; }
+        .tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .tab-btn { background: none; border: none; color: #aaa; padding: 12px 24px; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: #fff; border-bottom-color: var(--accent-blue); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .purchase-item { padding: 12px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); margin-bottom: 5px; }
+        .item-header { display: flex; justify-content: space-between; align-items: center; }
+        .upgrades { margin-top: 10px; padding-left: 25px; font-size: 0.9em; color: #aaa; display: flex; gap: 15px; }
+        .upgrades label { cursor: pointer; }
+        input[type="number"] { width: 50px; background: #333; color: white; border: 1px solid #555; text-align: center; }
+        select { background: #333; color: white; border: 1px solid #555; padding: 3px; }
+        .launch-btn { background: var(--accent-red); color: white; border: none; padding: 15px; font-size: 1.2em; font-weight: bold; width: 100%; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="stats-grid">
+            <div>Points Used <span id="ui-points">0 / 100</span></div>
+            <div>Delay Time <span id="ui-hours">0 Hours</span></div>
+            <div>Departure <span id="ui-date">26 Dec 2027</span></div>
+        </div>
+        <div class="timeline-track"><div id="timeline-fill" class="timeline-fill"></div></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'tab-default')">Default Fleet (0 pts)</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-escorts')">Escorts</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-raf')">RAF & Airwing</button>
+    </div>
+
+    <!-- Default Fleet -->
+    <div id="tab-default" class="tab-content active">
+        <div class="purchase-item">
+            <div class="item-header">
+                <label><input type="checkbox" class="asset-checkbox" data-pts="0" data-type="Ship" data-dbid="1008" data-name="HMS Queen Elizabeth" checked disabled> HMS Queen Elizabeth (Default CSG)</label>
+                <select class="fleet-select"><option value="FLEET_SPAWN1">Carrier TF</option></select>
+            </div>
+            <div class="upgrades">
+                Carrier Mag Fill (4 pts each): 
+                <label><input type="checkbox" class="mag-upgrade" data-pts="4" data-target="HMS Queen Elizabeth"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="4" data-target="HMS Queen Elizabeth"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="4" data-target="HMS Queen Elizabeth"> +25%</label>
+            </div>
+        </div>
+        <div class="purchase-item">
+            <div class="item-header">
+                <label><input type="checkbox" class="asset-checkbox" data-pts="0" data-type="Ship" data-dbid="3199" data-name="HMS St Albans" checked disabled> HMS St Albans (ASW Escort)</label>
+                <select class="fleet-select"><option value="FLEET_SPAWN1">Carrier TF</option></select>
+            </div>
+            <div class="upgrades">
+                VLS Fill (1 pt each): 
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS St Albans"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS St Albans"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS St Albans"> +25%</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Escorts -->
+    <div id="tab-escorts" class="tab-content">
+        <div class="purchase-item">
+            <div class="item-header">
+                <label><input type="checkbox" class="asset-checkbox" data-pts="10" data-type="Ship" data-dbid="3438" data-name="HMS Defender" onchange="calculateTotals()"> HMS Defender (Type 45, Sea Viper) (+10 pts)</label>
+                <select class="fleet-select"><option value="FLEET_SPAWN2">Advance TF</option></select>
+            </div>
+            <div class="upgrades">
+                VLS Fill (1 pt each): 
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS Defender" onchange="calculateTotals()"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS Defender" onchange="calculateTotals()"> +25%</label>
+                <label><input type="checkbox" class="mag-upgrade" data-pts="1" data-target="HMS Defender" onchange="calculateTotals()"> +25%</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAF & Airwing (Quantity Spinners) -->
+    <div id="tab-raf" class="tab-content">
+        <div class="purchase-item">
+            <div class="item-header">
+                <label>
+                    <input type="number" class="asset-spinner" data-pts="1" data-type="Aircraft" data-dbid="1420" data-name="A400M Atlas" min="0" max="10" value="0" onchange="calculateTotals()">
+                    A400M Atlas C.1 (+1 pt each, Max 10)
+                </label>
+                <select class="fleet-select"><option value="BASE_ASCENSION">Ascension Island</option></select>
+            </div>
+        </div>
+    </div>
+
+    <button class="launch-btn" onclick="executeLaunch()">LAUNCH TASK FORCE</button>
+
+    <script>
+        const MAX_POINTS = 100;
+        const BASE_DATE = new Date("2027-12-26T08:00:00Z");
+
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        function calculateTotals() {
+            let pts = 0;
+            // Add Checkboxes
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => pts += parseInt(cb.getAttribute('data-pts')));
+            // Add Spinners (Qty * Pts)
+            document.querySelectorAll('.asset-spinner').forEach(sp => pts += (parseInt(sp.value) * parseInt(sp.getAttribute('data-pts'))));
+
+            if (pts > MAX_POINTS) {
+                alert("Maximum delay budget of 100 points exceeded!");
+                event.target.type === 'checkbox' ? event.target.checked = false : event.target.value = parseInt(event.target.value) - 1;
+                return calculateTotals();
+            }
+
+            document.getElementById('ui-points').innerText = `${pts} / 100`;
+            document.getElementById('ui-hours').innerText = `${pts * 5} Hours`;
+            
+            const newDate = new Date(BASE_DATE.getTime() + (pts * 5 * 60 * 60 * 1000));
+            document.getElementById('ui-date').innerText = newDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            document.getElementById('timeline-fill').style.width = `${(pts / MAX_POINTS) * 100}%`;
+        }
+
+        function executeLaunch() {
+            let payload = { totalPoints: 0, units: [], upgrades: {} };
+            
+            // Gather standard assets and default fleet
+            document.querySelectorAll('.asset-checkbox:checked').forEach(cb => {
+                payload.units.push({
+                    type: cb.getAttribute('data-type'),
+                    dbid: parseInt(cb.getAttribute('data-dbid')),
+                    name: cb.getAttribute('data-name'),
+                    spawnRP: cb.closest('.purchase-item').querySelector('.fleet-select').value,
+                    qty: 1
+                });
+                payload.totalPoints += parseInt(cb.getAttribute('data-pts'));
+            });
+
+            // Gather spinner assets (RAF)
+            document.querySelectorAll('.asset-spinner').forEach(sp => {
+                let qty = parseInt(sp.value);
+                if (qty > 0) {
+                    payload.units.push({
+                        type: sp.getAttribute('data-type'),
+                        dbid: parseInt(sp.getAttribute('data-dbid')),
+                        name: sp.getAttribute('data-name'),
+                        spawnRP: sp.closest('.purchase-item').querySelector('.fleet-select').value,
+                        qty: qty
+                    });
+                    payload.totalPoints += (qty * parseInt(sp.getAttribute('data-pts')));
+                }
+            });
+
+            // Gather Mag/VLS upgrades
+            document.querySelectorAll('.mag-upgrade:checked').forEach(cb => {
+                let target = cb.getAttribute('data-target');
+                if (!payload.upgrades[target]) payload.upgrades[target] = 0;
+                payload.upgrades[target] += 25; // Adds 25% per tick
+                payload.totalPoints += parseInt(cb.getAttribute('data-pts'));
+            });
+
+            if (window.chrome && window.chrome.webview) { window.chrome.webview.postMessage(JSON.stringify(payload)); } 
+            else { console.log(JSON.stringify(payload)); alert("Launched!"); }
+        }
+    </script>
+</body>
+</html>

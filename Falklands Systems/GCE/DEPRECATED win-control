@@ -1,0 +1,34 @@
+-- ==============================================================================
+-- STRATEGIC VICTORY CHECK
+-- ==============================================================================
+function GCE_CheckCampaignVictory()
+    local stanleySecured = ScenEdit_GetKeyValue("ZCTRL_ZONE_STANLEY_SECURED") or "FALSE"
+    local pleasantSecured = ScenEdit_GetKeyValue("ZCTRL_ZONE_PLEASANT_SECURED") or "FALSE"
+    
+    if stanleySecured == "TRUE" and pleasantSecured == "TRUE" then
+        local totalSecured = 0
+        for _, zone in ipairs(GCE_Zones) do
+            if (ScenEdit_GetKeyValue("ZCTRL_" .. zone .. "_SECURED") or "FALSE") == "TRUE" then
+                totalSecured = totalSecured + 1
+            end
+        end
+        
+        -- Win condition: Stanley + Pleasant + at least 6 other zones (8/11 total)
+        if totalSecured >= 8 then
+            local msg = string.format([[
+                <body bgcolor="#121212" text="#50E3C2" style="font-family: Arial, sans-serif;">
+                    <h2>TASK FORCE FALKLANDS: MISSION ACCOMPLISHED</h2>
+                    <p>With the capture of Stanley and Mount Pleasant Airfield, along with %d of 11 strategic sectors, Argentine resistance on East and West Falkland has collapsed.</p>
+                    <p>Surviving enemy forces have initiated a general surrender.</p>
+                    <h3>OUTSTANDING STRATEGIC VICTORY</h3>
+                </body>
+            ]], totalSecured)
+            
+            ScenEdit_SpecialMessage("UK", msg)
+            ScenEdit_EndScenario()
+        end
+    end
+end
+
+-- Call at the end of the loop cycle
+GCE_CheckCampaignVictory()

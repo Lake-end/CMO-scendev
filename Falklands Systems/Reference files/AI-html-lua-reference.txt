@@ -1,0 +1,101 @@
+Command: Modern Operations (CMO) HTML UI - AI Implementation Reference
+Architectural Overview
+
+Command: Modern Operations utilizes a Microsoft Edge WebView2 control (Chromium-based) to render custom user interfaces. The simulation state is divided into two distinct execution contexts that do not share memory natively:   
+
+    Host Context (Lua Engine): The persistent simulation engine. Maintains the game state, handles global key-value storage, and executes engine commands (e.g., spawning units).   
+
+    Client Context (JavaScript/HTML/WebView2): A volatile environment created when a dialog opens and destroyed when it closes. Handles Document Object Model (DOM) rendering, client-side validation, and external library execution (e.g., Leaflet.js).   
+
+You must implement one of two primary Inter-Process Communication (IPC) bridges: Synchronous or Asynchronous. Standard Command Professional Edition (PE) exclusive functions are not available and must not be used.   
+Bridge 1: Synchronous State Management (UI_CallAdvancedHTMLDialog)
+
+This function creates a blocking, modal interface. The simulation clock is entirely paused while this dialog is active. This is optimal for pre-game setups or critical decision points.   
+
+Lua Execution Signature:
+local return_table = UI_CallAdvancedHTMLDialog(title, html_payload, button_array)
+
+[cite: 6]
+
+    title: Window title string.
+
+    html_payload: Complete HTML document string, including inline CSS and <script> blocks.
+
+    button_array: Array of strings for the bottom-row buttons (e.g., {'Deploy', 'Cancel'}).
+
+Return Serialization Schema:
+When the user clicks a button to close the dialog, the engine serializes the DOM state and returns a Lua table.   
+
+    ['pressed']: The string value of the button clicked.
+
+    ['<element_name>']: The string value of any HTML <input>, <select>, or <textarea> where the name attribute is explicitly defined.   
+
+Required Data Coercion Pattern:
+The CMO backend serializes all numerical inputs as strings and frequently appends extraneous single quotes ('). You must sanitize and type-cast the data in Lua before utilizing it:
+local sanitized_number = tonumber(string.gsub(return_table['input_name'], "%'", ""))   
+
+Hidden Input Synchronization:
+Because JS cannot proactively send data to Lua while this modal is open, complex calculations (like item costs or clicked map coordinates) must be stored in the DOM. Use <input type="hidden"> fields and have your JS event listeners update their value attributes. Lua will scrape these hidden values upon dialog closure.   
+Bridge 2: Asynchronous IPC (ScenEdit_SpecialMessage)
+
+ScenEdit_SpecialMessage evaluates HTML and executes embedded JavaScript without pausing the simulation clock. This is required for dynamic storefronts, dashboards, and live unit purchasing.   
+
+Data Transmission via postMessage:
+Data must be manually transmitted from the active WebView back to the Lua host using the WebView2 API. Implement JS event listeners that dispatch messages using the following exact syntax:
+window.chrome.webview.postMessage("DIALOG_OK" + lua_command_string);   
+
+Payload Construction:
+
+    Prefix: You MUST prepend the string with "DIALOG_OK". The CMO engine uses this as a security key to intercept and execute the remainder of the payload as Lua code.   
+
+    Serialization: Complex data (like shopping cart arrays) must be serialized into a JSON string on the client side, appended to the Lua function call string, and deserialized in the Lua host script.   
+
+JS Implementation Example:
+const payload = JSON.stringify(shoppingCart);
+
+[cite: 3]
+
+window.chrome.webview.postMessage("DIALOG_OKMyNamespace.ProcessOrder('" + payload + "')");
+
+[cite: 7]
+Critical Algorithmic Requirement: CSS Formatting Collision
+
+When generating dynamic HTML payloads via Lua's string.format(), a fatal syntax collision occurs with CSS. CSS utilizes the % symbol for dimensions (e.g., width: 100%;). Lua's string.format() reserves % for formatting tokens (e.g., %s, %d). Passing unescaped CSS through string.format() causes script termination.   
+
+Required Escaping Algorithm:
+You must process raw HTML strings through this specific isolation and escaping function prior to formatting:   
+Lua
+
+local function EscapePercentsButKeep_s(str)
+    -- Protect intended formatting slots
+    str = string.gsub(str, 'value="%%s"', 'value="__FMT_S__"', 1)
+    
+    -- Escape literal CSS percentages
+    str = string.gsub(str, "%%", "%%%%")
+    
+    -- Restore formatting slots
+    str = string.gsub(str, 'value="__FMT_S__"', 'value="%%s"', 1)
+    return str
+end
+
+Dynamic State Management & DOM Generation (MVC Pattern)
+
+When building interactive interfaces like unit purchasing screens, implement the following pattern:
+
+    Lua Model: Define all available units, base costs, max capacities, and budgets in a centralized Lua table. Inject this table into the HTML as a JSON string during initialization.   
+
+    JS Controller & View: The JavaScript environment parses the JSON and dynamically generates DOM elements (Unit Cards) using document.createElement. This avoids hardcoding hundreds of elements. Use CSS Flexbox/Grid for responsive rendering.   
+
+    Client-Side Validation: JavaScript must validate purchases instantly (e.g., checking cost <= currentBudget and updating a cart array) to provide immediate feedback.   
+
+    Lua Server-Side Execution: Upon receiving the serialized cart via postMessage, Lua verifies the final math against persistent global key-values (using ScenEdit_SetKeyValue) to prevent client spoofing, deducts the total budget, and sequentially loops through the array using ScenEdit_AddUnit() to instantiate the forces.   
+
+Geospatial Integration via Leaflet.js
+
+CMO WebViews support external Content Delivery Networks (CDNs). Leaflet.js is the standard for rendering interactive targeting and deployment maps within the UI.   
+
+    Initialization: Embed Leaflet JS/CSS from an external CDN. Instantiate L.map bound to a specific HTML <div>.
+
+    Tile Sourcing: Fetch map imagery using L.tileLayer from open-source providers (e.g., CartoDB Dark Matter or OpenTopoMap).   
+
+    Coordinate Extraction: Bind a click listener (map.on('click', function(e) {...})) to extract e.latlng.lat and e.latlng.lng. Write these values into hidden HTML inputs or your JSON state object to bridge the coordinates back to Lua for precise unit spawning.
