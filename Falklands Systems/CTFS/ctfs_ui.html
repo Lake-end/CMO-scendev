@@ -796,10 +796,12 @@
     <div class="launch-container">
         <button type="button" class="launch-btn" onclick="executeLaunch()">
             <span class="btn-main-title">LAUNCH OPERATION RECORPORATE</span>
-            <span class="btn-sub-title">Deploy task force to theater &bull; You can close this window after pressing
-                this</span>
+            <span class="btn-sub-title" id="btn-sub-title" style="display: none;">You can safely close this window</span>
         </button>
     </div>
+
+    <!-- Operational Orders Display (Full Widescreen View on Launch) -->
+    <div id="orders-display" style="display: none; padding: 10px 0 30px 0; max-width: 960px; margin: 0 auto;"></div>
 
     <script>
         const MAX_POINTS = 100;
@@ -869,7 +871,7 @@
             // 2. Aircraft (Drones, Helicopters, Fixed-Wing) - Checked BEFORE Ships!
             if (type === 'Aircraft' || (!type && (role.includes('aircraft') || role.includes('helo') || role.includes('helicopter') || role.includes('drone') || role.includes('uav')))) {
                 // Drones / UAVs
-                if (role.includes('uav') || role.includes('drone') || name.includes('protector') || name.includes('scaneagle') || name.includes('peregrine') || name.includes('camcopter')) {
+                if (role.includes('uav') || role.includes('drone') || name.includes('protector') || name.includes('scaneagle') || name.includes('peregrine') || name.includes('camcopter') || name.includes('mojave') || name.includes('puma') || name.includes('malloy') || name.includes('proteus') || id.includes('mojave') || id.includes('puma') || id.includes('malloy') || id.includes('proteus')) {
                     return UNIT_SVGS.uav_drone;
                 }
                 // Helicopters
@@ -916,7 +918,7 @@
             if (role.includes('destroyer') || role.includes('type 45') || name.includes('daring') || name.includes('defender') || name.includes('dragon') || name.includes('dauntless') || name.includes('diamond')) {
                 return UNIT_SVGS.destroyer;
             }
-            if (role.includes('frigate') || role.includes('type 23') || role.includes('type 26') || role.includes('type 31') || name.includes('albans') || name.includes('somerset') || name.includes('glasgow') || name.includes('venturer') || name.includes('kent') || name.includes('portland') || name.includes('sutherland')) {
+            if (role.includes('frigate') || role.includes('type 23') || role.includes('type 26') || role.includes('type 31') || role.includes('patrol') || role.includes('river') || name.includes('albans') || name.includes('somerset') || name.includes('glasgow') || name.includes('venturer') || name.includes('kent') || name.includes('portland') || name.includes('sutherland') || name.includes('medway')) {
                 return UNIT_SVGS.frigate;
             }
             if (role.includes('bay-class') || name.includes('bay') || role.includes('landing ship')) {
@@ -968,10 +970,11 @@
                 items: [
                     // Default Carrier Strike Group & Auxiliaries (0 pts)
                     { id: "QE", type: "Ship", dbid: 1008, name: "HMS Queen Elizabeth", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Carrier Strike Group (CSG) Flagship", upgradeCost: 4 },
-                    { id: "StAlbans", type: "Ship", dbid: 3199, name: "HMS St Albans", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 23 ASW Frigate", upgradeCost: 1 },
-                    { id: "Daring", type: "Ship", dbid: 3200, name: "HMS Daring", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 45 Destroyer", upgradeCost: 1 },
-                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN3", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "Tideforce", type: "Ship", dbid: 2581, name: "RFA Tideforce", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN3", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Tide-class Replenishment Tanker" },
+                    { id: "StAlbans", type: "Ship", dbid: 3199, name: "HMS St Albans", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Daring", type: "Ship", dbid: 3200, name: "HMS Daring", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "Tideforce", type: "Ship", dbid: 2581, name: "RFA Tideforce", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+                    { id: "Medway", type: "Ship", dbid: 2805, name: "HMS Medway", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_FALKLANDS", category: "default", group: "Falklands Forward Patrol Asset", role: "River-class Batch 2 OPV (Falklands Forward Patrol) — Embarked: 2x Peregrine UAV" },
 
                     // Default Carrier Airwing (0 pts)
                     { id: "F35B_def", type: "Aircraft", dbid: 1095, name: "F-35B Lightning II", isDefault: true, pts: 0, qty: 12, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Strike Fighter (1st Sq. - 12x Aircraft)", loadoutid: 25647 },
@@ -979,7 +982,7 @@
                     { id: "Merlin_def", type: "Aircraft", dbid: 3336, name: "Merlin HM.2", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier ASW Helicopter (2x Aircraft)", loadoutid: 8559 },
                     { id: "Crowsnest_def", type: "Aircraft", dbid: 4110, name: "Merlin ASaC.5 Crowsnest", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier AEW Helicopter (2x Aircraft)", loadoutid: 8559 },
                     { id: "MerlinHC4_def", type: "Aircraft", dbid: 4273, name: "Merlin HC.4", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Transport Helicopter (2x Aircraft)", loadoutid: 21903 },
-                    { id: "Peregrine_def", type: "Aircraft", dbid: 6688, name: "Camcopter S-100 Peregrine", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Reconnaissance UAV (2x Drones)", loadoutid: 16923 },
+                    { id: "Mojave_def", type: "Aircraft", dbid: 5696, name: "Mojave UAV", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Strike/Recon UAV (2x Drones)", loadoutid: 30519 },
 
                     // Default RAF (0 pts)
                     { id: "Poseidon_def", type: "Aircraft", dbid: 4940, name: "P-8 Poseidon MRA.1", isDefault: true, pts: 0, qty: 2, spawnRP: "W8V2DT-0HNODCG173JA6", category: "default", group: "RAF Theater Air Support", role: "Maritime Patrol (RAF Lossiemouth - 2x Aircraft)", loadoutid: 27683 },
@@ -989,19 +992,22 @@
                     { id: "Protector_def", type: "Aircraft", dbid: 4724, name: "Protector RG.1", isDefault: true, pts: 0, qty: 1, spawnRP: "W8V2DT-0HNODCG173JC2", category: "default", group: "RAF Theater Air Support", role: "Strategic UAV (RAF Marham - 1x Drone)", loadoutid: 13989 },
 
                     // Escorts & Auxiliaries
-                    { id: "Somerset", type: "Ship", dbid: 3199, name: "HMS Somerset", pts: 5, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Type 23 ASW Frigates", role: "Type 23 ASW Frigate", upgradeCost: 1 },
-                    { id: "Defender", type: "Ship", dbid: 3438, name: "HMS Defender", pts: 10, maxLimit: 1, spawnRP: "FLEET_SPAWN2", category: "escorts", group: "Type 45 Air Defense Destroyers", role: "Type 45 Destroyer (Sea Ceptor Upgrade)", upgradeCost: 1 },
-                    { id: "Glasgow", type: "Ship", dbid: 2795, name: "HMS Glasgow", pts: 7, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 26 Advanced ASW Frigate", upgradeCost: 1 },
-                    { id: "Anson", type: "Submarine", dbid: 725, name: "HMS Anson", pts: 5, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Subsurface Fleet (Astute-Class SSN)", role: "Astute-Class Nuclear Submarine" },
+                    { id: "Somerset", type: "Ship", dbid: 3199, name: "HMS Somerset", pts: 5, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "escorts", group: "Type 23 ASW Frigates", role: "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Defender", type: "Ship", dbid: 3438, name: "HMS Defender", pts: 10, maxLimit: 1, spawnRP: "BASE_PORTSMOUTH", category: "escorts", group: "Type 45 Air Defense Destroyers", role: "Type 45 Destroyer (Sea Ceptor - 1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Venturer", type: "Ship", dbid: 3271, name: "HMS Venturer", pts: 3, maxLimit: 1, spawnRP: "BASE_ROSYTH", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 31 General Purpose Frigate (1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Glasgow", type: "Ship", dbid: 2795, name: "HMS Glasgow", pts: 7, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 26 Advanced ASW Frigate (1x Wildcat, 1x Proteus & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Anson", type: "Submarine", dbid: 725, name: "HMS Anson", pts: 5, maxLimit: 1, spawnRP: "BASE_CLYDE", category: "escorts", group: "Subsurface Fleet (Astute-Class SSN)", role: "Astute-Class Nuclear Submarine" },
 
-                    { id: "MountsBay", type: "Ship", dbid: 1451, name: "RFA Mounts Bay", pts: 3, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "CardiganBay", type: "Ship", dbid: 1451, name: "RFA Cardigan Bay", pts: 3, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "FortVictoria", type: "Ship", dbid: 406, name: "RFA Fort Victoria", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Tide-Class & Fleet Replenishment (AOR)", role: "AOR Fleet Replenishment Vessel" },
-                    { id: "HurstPoint", type: "Ship", dbid: 2423, name: "MV Hurst Point", pts: 1, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "Point-Class Strategic Sealift (Ro-Ro)", role: "STUFT Strategic Ro-Ro Cargo" },
-                    { id: "Canberra", type: "Ship", dbid: 2024, name: "MV Canberra", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
-                    { id: "QueenVictoria", type: "Ship", dbid: 2024, name: "MV Queen Victoria", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+                    { id: "MountsBay", type: "Ship", dbid: 1451, name: "RFA Mounts Bay", pts: 3, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "CardiganBay", type: "Ship", dbid: 1451, name: "RFA Cardigan Bay", pts: 3, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "FortVictoria", type: "Ship", dbid: 406, name: "RFA Fort Victoria", pts: 2, maxLimit: 1, spawnRP: "BASE_PORTLAND", category: "support", group: "Tide-Class & Fleet Replenishment (AOR)", role: "AOR Fleet Replenishment (1x Merlin, 1x HC.4 & 1x Peregrine)" },
+                    { id: "HurstPoint", type: "Ship", dbid: 2423, name: "MV Hurst Point", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "Point-Class Strategic Sealift (Ro-Ro)", role: "STUFT Strategic Ro-Ro Cargo" },
+                    { id: "Canberra", type: "Ship", dbid: 2024, name: "MV Canberra", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+                    { id: "QueenVictoria", type: "Ship", dbid: 2024, name: "MV Queen Victoria", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
 
                     { id: "F35B_add", type: "Aircraft", dbid: 1095, name: "F-35B Lightning II", pts: 20, maxLimit: 1, spawnQty: 12, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Strike Fighter (2nd Squadron - 12x Aircraft)", loadoutid: 25647 },
+                    { id: "Mojave_add", type: "Aircraft", dbid: 5696, name: "Mojave UAV", pts: 1, maxLimit: 4, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Strike/Recon UAV", loadoutid: 30519 },
+                    { id: "Peregrine_add", type: "Aircraft", dbid: 6688, name: "Camcopter S-100 Peregrine", pts: 1, maxLimit: 1, spawnQty: 4, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Recon UAV Flight (4x Drones)", loadoutid: 16924 },
                     { id: "Crowsnest_add", type: "Aircraft", dbid: 4110, name: "Merlin ASaC.5 Crowsnest", pts: 1, maxLimit: 2, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier AEW Helicopter", loadoutid: 8559 },
 
                     { id: "Wedgetail_add", type: "Aircraft", dbid: 4941, name: "E-7A Wedgetail AEW.1", pts: 4, maxLimit: 1, spawnRP: "W8V2DT-0HNODCG173J98", category: "raf", group: "Intelligence, Surveillance & Reconnaissance (ISR)", role: "AEW&C (Brize Norton)", loadoutid: 27687 },
@@ -1150,13 +1156,38 @@
 
                 const upTitle = document.createElement('div');
                 upTitle.className = 'upgrades-header';
-                upTitle.innerText = `VLS / Magazine Fill (+${item.upgradeCost} pts / 25%)`;
-                upgradeBox.appendChild(upTitle);
 
                 const upRow = document.createElement('div');
                 upRow.className = 'upgrades-row';
 
-                for (let step = 1; step <= 3; step++) {
+                if (item.name === 'HMS Queen Elizabeth') {
+                    upTitle.innerText = `Aviation Magazine Fill (+${item.upgradeCost} pts / +25%)`;
+                    upgradeBox.appendChild(upTitle);
+
+                    const stepLabels = ['+25% (50% Fill)', '+50% (75% Fill)', '+75% (100% Fill)'];
+                    for (let step = 1; step <= 3; step++) {
+                        const label = document.createElement('label');
+                        label.className = 'upgrade-chip';
+
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.className = 'mag-upgrade';
+                        cb.setAttribute('data-target', item.name);
+                        cb.setAttribute('data-pts', item.upgradeCost.toString());
+                        cb.setAttribute('data-step-fill', '25');
+                        cb.onchange = calculateTotals;
+
+                        const txt = document.createElement('span');
+                        txt.innerText = stepLabels[step - 1];
+
+                        label.appendChild(cb);
+                        label.appendChild(txt);
+                        upRow.appendChild(label);
+                    }
+                } else {
+                    upTitle.innerText = `Missile Silo Fill (Default: Peacetime 25%)`;
+                    upgradeBox.appendChild(upTitle);
+
                     const label = document.createElement('label');
                     label.className = 'upgrade-chip';
 
@@ -1165,10 +1196,11 @@
                     cb.className = 'mag-upgrade';
                     cb.setAttribute('data-target', item.name);
                     cb.setAttribute('data-pts', item.upgradeCost.toString());
+                    cb.setAttribute('data-fill', '100');
                     cb.onchange = calculateTotals;
 
                     const txt = document.createElement('span');
-                    txt.innerText = `+25%`;
+                    txt.innerText = `Full VLS Silos (+${item.upgradeCost} pts)`;
 
                     label.appendChild(cb);
                     label.appendChild(txt);
@@ -1383,8 +1415,13 @@
 
             document.querySelectorAll('.mag-upgrade:checked').forEach(cb => {
                 const target = cb.getAttribute('data-target');
-                if (!payload.upgrades[target]) payload.upgrades[target] = 0;
-                payload.upgrades[target] += 25;
+                const stepFill = cb.getAttribute('data-step-fill');
+                if (stepFill) {
+                    payload.upgrades[target] = (payload.upgrades[target] || 0) + parseInt(stepFill);
+                } else {
+                    const fill = parseInt(cb.getAttribute('data-fill')) || 100;
+                    payload.upgrades[target] = fill;
+                }
                 payload.totalPoints += parseInt(cb.getAttribute('data-pts')) || 0;
             });
 
@@ -1401,14 +1438,156 @@
             document.getElementById('ctfs_points').value = payload.totalPoints.toString();
             document.getElementById('ctfs_hours').value = (payload.totalPoints * HOURS_PER_POINT).toString();
 
-            const launchBtn = document.querySelector('.launch-btn');
-            if (launchBtn) {
-                launchBtn.disabled = true;
-                launchBtn.classList.add('launched');
-                const mainTitle = launchBtn.querySelector('.btn-main-title');
-                const subTitle = launchBtn.querySelector('.btn-sub-title');
-                if (mainTitle) mainTitle.textContent = '✓ ORDERS TRANSMITTED — TASK FORCE DEPLOYED';
-                if (subTitle) subTitle.textContent = 'Forces deployed & scenario clock advanced. You can now close this window.';
+            // Calculate operational timing for Admiralty Orders
+            const hoursDelayed = payload.totalPoints * HOURS_PER_POINT;
+            const daysDelayed = (hoursDelayed / 24).toFixed(1);
+            const depDate = new Date(BASE_DATE.getTime() + hoursDelayed * 3600 * 1000);
+            const dd = String(depDate.getUTCDate()).padStart(2, '0');
+            const mm = String(depDate.getUTCMonth() + 1).padStart(2, '0');
+            const yyyy = depDate.getUTCFullYear();
+            const hh = String(depDate.getUTCHours()).padStart(2, '0');
+            const min = String(depDate.getUTCMinutes()).padStart(2, '0');
+            const sec = String(depDate.getUTCSeconds()).padStart(2, '0');
+            const departureDTG = `${dd}.${mm}.${yyyy} ${hh}:${min}:${sec}Z`;
+
+            // Hide force selection interface elements
+            const hud = document.querySelector('.hud-dashboard');
+            const tabsHeader = document.getElementById('tabs-header');
+            const tabsContainer = document.getElementById('tabs-container');
+            const launchContainer = document.querySelector('.launch-container');
+
+            if (tabsHeader) tabsHeader.style.display = 'none';
+            if (tabsContainer) tabsContainer.style.display = 'none';
+            if (launchContainer) launchContainer.style.display = 'none';
+
+            if (hud) {
+                const stats = hud.querySelector('.stats-grid');
+                const timeline = hud.querySelector('.timeline-container');
+                const threatTitle = document.getElementById('threat-feed-title');
+                const threatPills = hud.querySelector('.threat-pills');
+                if (stats) stats.style.display = 'none';
+                if (timeline) timeline.style.display = 'none';
+                if (threatTitle) threatTitle.style.display = 'none';
+                if (threatPills) threatPills.style.display = 'none';
+            }
+
+            // Render Full Widescreen Admiralty Operational Orders directly in large window
+            const ordersDisplay = document.getElementById('orders-display');
+            if (ordersDisplay) {
+                ordersDisplay.innerHTML = `
+                    <div style="background-color: #0d1322; color: #cbd5e1; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Tahoma, Geneva, Verdana, sans-serif; padding: 24px 28px; border-radius: 8px; border: 1px solid #1c273e; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);">
+                        
+                        <!-- Header Banner -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border-bottom: 2px solid #00d2ff; padding-bottom: 14px;">
+                            <tr>
+                                <td style="vertical-align: top;">
+                                    <div style="color: #00d2ff; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">MINISTRY OF DEFENCE &bull; PERMANENT JOINT HEADQUARTERS (PJHQ) NORTHWOOD</div>
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: 1.5px; margin-top: 5px;">ROYAL NAVY FLEET OPERATIONAL ORDER // OP RECORPORATE</div>
+                                </td>
+                                <td style="vertical-align: top; text-align: right;">
+                                    <span style="background-color: rgba(200, 16, 46, 0.2); border: 1px solid #c8102e; color: #ff6b81; font-family: monospace; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 4px; letter-spacing: 1.5px; display: inline-block;">
+                                        TOP SECRET // COMMANDER EYES ONLY
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Telemetry Strip -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; background-color: #070a12; border: 1px solid #1c273e; border-radius: 6px;">
+                            <tr>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">ORIGINATOR:</strong> CINCFLEET / NORTHWOOD
+                                </td>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">ACTION TO:</strong> CTF 317 (FLAGSHIP HMS QUEEN ELIZABETH)
+                                </td>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">DEPARTURE DTG:</strong> <span style="color: #ffffff; font-weight: bold;">${departureDTG}</span>
+                                </td>
+                                <td style="padding: 10px 14px; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">STAGING DELAY:</strong> <span style="color: #ffffff; font-weight: bold;">${daysDelayed} DAYS (${hoursDelayed} HRS)</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- 1. Situation & Mobilisation Report -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                1. SITUATION &amp; MOBILISATION REPORT
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Following an operational staging and mobilisation period (${daysDelayed} Days elapsed), Task Force 317 is formally released from home waters and cleared to commence theatre transit for the South Atlantic Joint Operations Area (JOA).
+                            </p>
+                            <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #94a3b8;">
+                                <strong style="color: #00d2ff;">INTELLIGENCE ASSESSMENT:</strong> The operational delay required to marshal surface combatants, carrier strike squadrons, and sealift tonnage in UK ports has afforded Argentine Joint Forces crucial strategic breathing room to entrench and reinforce.
+                            </p>
+                        </div>
+
+                        <!-- 2. Theatre Forward Presence -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                2. THEATRE FORWARD PRESENCE
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0; color: #cbd5e1;">
+                                The River-class Offshore Patrol Vessel <strong style="color: #ffffff;">HMS Medway</strong> is currently forward-deployed in the Falklands sector. Being lightly armed and isolated, <em>Medway</em> has adopted strict emissions control (<strong style="color: #ffffff;">EMCON Alpha</strong>) and a clandestine surveillance posture.
+                            </p>
+                        </div>
+
+                        <!-- 3. Force Organisation, Escort Doctrine & Speed Discipline -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px;">
+                                3. FORCE ORGANISATION, ESCORT DOCTRINE &amp; SPEED DISCIPLINE
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Commander Task Force 317 must immediately assemble all deployed surface and subsurface units into structured operational groups:
+                            </p>
+                            <ul style="margin: 0; padding-left: 22px; font-size: 13.5px; line-height: 1.65; color: #cbd5e1;">
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Speed Discipline &amp; Grouping:</strong> Carrier Strike Group must make its way towards the Area of Operations (AOO) at best possible speed whilst considering the trade-off between transit speed and fuel consumption. Slower auxiliary tankers, dry cargo, support, and amphibious ships need to be formed into separate formation(s) to prevent slowing capital ship manoeuvring.
+                                </li>
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Dedicated Escort Coverage:</strong> Unarmed civilian transports (STUFT cruise liners, Ro-Ros), amphibious landing ships, and logistics vessels must be protected through contested sea lanes. Form independent auxiliary convoys and assign dedicated surface escort and RAF presence along the convoy route.
+                                </li>
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Astute-Class SSNs:</strong> Fleet nuclear attack submarines are not bound by escort duties or fuel conservation. They can steam south at sustained high speeds to establish an advance screening and subsurface sea denial ahead of the main fleet, and begin building tactical situational awareness around the Falklands.
+                                </li>
+                                <li>
+                                    <strong style="color: #00d2ff;">Fuel Conservation &amp; Replenishment:</strong> Distance from the United Kingdom to Ascension Island and onward to the Falklands exceeds 7,000 nautical miles. Fuel conservation needs to be managed from the start for both ships and aircraft making the transit. Each fleet formation and each flight heading out should be supported by an adequate allocation of fleet tankers (RFA Tide/Wave class) and RAF Voyager refuelling assets.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 4. Midway Point (Ascension Island) -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 18px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                4. MIDWAY POINT (ASCENSION ISLAND)
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Excluding forward Falklands presence (HMS <em>Medway</em> and advance sprinting SSNs), all fleets and transiting aircraft must stop at <strong style="color: #ffffff;">Ascension Island (Wideawake Airfield / Anchorage)</strong> to refuel, load stores and troops, and reorganise for the final push towards the Falklands Theatre. Ascension is the last stop before the Area of Operations and the final opportunity to make ready for action.
+                            </p>
+                            <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #94a3b8;">
+                                <strong style="color: #00d2ff;">OPERATIONAL NOTICE:</strong> Expect new orders and refined intelligence updates when the fleet assembles at Ascension Island.
+                            </p>
+                        </div>
+
+                        <!-- Confirmation Banner -->
+                        <div style="background: linear-gradient(180deg, #1b5e20 0%, #0d3813 100%); border: 1px solid #00e676; border-radius: 6px; padding: 16px 20px; text-align: center; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0, 230, 118, 0.25);">
+                            <div style="color: #ffffff; font-size: 15px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">
+                                ORDERS TRANSMITTED - TASK FORCE DEPLOYED
+                            </div>
+                            <div style="color: #a7f3d0; font-size: 12px; margin-top: 4px; font-weight: 600;">
+                                You can safely close this window
+                            </div>
+                        </div>
+
+                        <!-- Footer Sign-off -->
+                        <div style="border-top: 1px solid #1c273e; padding-top: 12px; font-size: 11px; color: #64748b; text-align: center; letter-spacing: 1.5px; text-transform: uppercase;">
+                            ADMIRALTY SIGNAL // PERMANENT JOINT HEADQUARTERS // GOD SAVE THE KING // OUT
+                        </div>
+                    </div>
+                `;
+                ordersDisplay.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             // BRIDGE 2: Asynchronous WebView2 IPC (defend-luzon reference pattern)
@@ -1416,11 +1595,6 @@
                 window.chrome.webview.postMessage("DIALOG_OK" + "CTFS_ProcessUIResponse('" + encodedPayload + "')");
             } else {
                 console.log("BRIDGE 2 POSTMESSAGE DISPATCH:", "DIALOG_OK" + "CTFS_ProcessUIResponse('" + encodedPayload + "')");
-                alert("TASK FORCE LAUNCHED (PREVIEW MODE)\n\n" +
-                    "Points Spent: " + payload.totalPoints + " / 100\n" +
-                    "Operation Start Delay: " + (payload.totalPoints * HOURS_PER_POINT / 24).toFixed(1) + " Days\n" +
-                    "Total Units Selected: " + payload.units.length + "\n\n" +
-                    "In-game CMO execution will advance the scenario clock, spawn forces, and apply Argentine escalation boons.");
             }
         }
 

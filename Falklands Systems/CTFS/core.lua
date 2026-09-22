@@ -198,79 +198,81 @@ CTFS.MODEL = {
     },
     items = {
         -- Default Carrier Strike Group & Auxiliaries (0 pts)
-        { id = "QE",                  type = "Ship",      dbid = 1008, name = "HMS Queen Elizabeth",       isDefault = true, pts = 0,       qty = 1,                          spawnRP = "FLEET_SPAWN1",         category = "default",  group = "Task Force Warships & Surface Auxiliaries",           role = "Carrier Strike Group (CSG) Flagship",   upgradeCost = 4 },
-        { id = "StAlbans",            type = "Ship",      dbid = 3199, name = "HMS St Albans",             isDefault = true, pts = 0,       qty = 1,                          spawnRP = "FLEET_SPAWN1",         category = "default",  group = "Task Force Warships & Surface Auxiliaries",           role = "Type 23 ASW Frigate",                   upgradeCost = 1 },
-        { id = "Daring",              type = "Ship",      dbid = 3200, name = "HMS Daring",                isDefault = true, pts = 0,       qty = 1,                          spawnRP = "FLEET_SPAWN1",         category = "default",  group = "Task Force Warships & Surface Auxiliaries",           role = "Type 45 Destroyer",                     upgradeCost = 1 },
-        { id = "LymeBay",             type = "Ship",      dbid = 1451, name = "RFA Lyme Bay",              isDefault = true, pts = 0,       qty = 1,                          spawnRP = "FLEET_SPAWN3",         category = "default",  group = "Task Force Warships & Surface Auxiliaries",           role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-        { id = "Tideforce",           type = "Ship",      dbid = 2581, name = "RFA Tideforce",             isDefault = true, pts = 0,       qty = 1,                          spawnRP = "FLEET_SPAWN3",         category = "default",  group = "Task Force Warships & Surface Auxiliaries",           role = "Tide-class Replenishment Tanker" },
+        { id = "QE", type = "Ship", dbid = 1008, name = "HMS Queen Elizabeth", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Carrier Strike Group (CSG) Flagship", upgradeCost = 4 },
+        { id = "StAlbans", type = "Ship", dbid = 3199, name = "HMS St Albans", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Daring", type = "Ship", dbid = 3200, name = "HMS Daring", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "LymeBay", type = "Ship", dbid = 1451, name = "RFA Lyme Bay", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+        { id = "Tideforce", type = "Ship", dbid = 2581, name = "RFA Tideforce", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+        { id = "Medway", type = "Ship", dbid = 2805, name = "HMS Medway", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_FALKLANDS", category = "default", group = "Falklands Forward Patrol Asset", role = "River-class Batch 2 OPV (Falklands Forward Patrol) — Embarked: 2x Peregrine UAV" },
 
         -- Default Carrier Airwing (0 pts)
-        { id = "F35B_def",            type = "Aircraft",  dbid = 1095, name = "F-35B Lightning II",        isDefault = true, pts = 0,       qty = 12,                         spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier Strike Fighter (1st Sq. - 12x Aircraft)",      loadoutid = 25647 },
-        { id = "Wildcat_def",         type = "Aircraft",  dbid = 6786, name = "Wildcat HMA.2",             isDefault = true, pts = 0,       qty = 2,                          spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier ASW/Utility Helo (2x Aircraft)",              loadoutid = 17706 },
-        { id = "Merlin_def",          type = "Aircraft",  dbid = 3336, name = "Merlin HM.2",               isDefault = true, pts = 0,       qty = 2,                          spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier ASW Helicopter (2x Aircraft)",                loadoutid = 8559 },
-        { id = "Crowsnest_def",       type = "Aircraft",  dbid = 4110, name = "Merlin ASaC.5 Crowsnest",   isDefault = true, pts = 0,       qty = 2,                          spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier AEW Helicopter (2x Aircraft)",                loadoutid = 8559 },
-        { id = "MerlinHC4_def",       type = "Aircraft",  dbid = 4273, name = "Merlin HC.4",               isDefault = true, pts = 0,       qty = 2,                          spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier Transport Helicopter (2x Aircraft)",          loadoutid = 21903 },
-        { id = "Peregrine_def",       type = "Aircraft",  dbid = 6688, name = "Camcopter S-100 Peregrine", isDefault = true, pts = 0,       qty = 2,                          spawnRP = "HMS Queen Elizabeth",  category = "default",  group = "Carrier Air Wing (Embarkation)",                     role = "Carrier Reconnaissance UAV (2x Drones)",            loadoutid = 16923 },
+        { id = "F35B_def", type = "Aircraft", dbid = 1095, name = "F-35B Lightning II", shortName = "F-35B Lightning II", squadron = "617 Sqn", isDefault = true, pts = 0, qty = 12, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier Strike Fighter (1st Sq. - 12x Aircraft)", loadoutid = 25647 },
+        { id = "Wildcat_def", type = "Aircraft", dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", isDefault = true, pts = 0, qty = 2, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier ASW/Utility Helo (2x Aircraft)", loadoutid = 17706 },
+        { id = "Merlin_def", type = "Aircraft", dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "820 NAS", isDefault = true, pts = 0, qty = 2, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier ASW Helicopter (2x Aircraft)", loadoutid = 8559 },
+        { id = "Crowsnest_def", type = "Aircraft", dbid = 4110, name = "Merlin ASaC.5 Crowsnest", shortName = "Merlin ASaC.5 Crowsnest", squadron = "820 NAS", isDefault = true, pts = 0, qty = 2, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier AEW Helicopter (2x Aircraft)", loadoutid = 8559 },
+        { id = "MerlinHC4_def", type = "Aircraft", dbid = 4273, name = "Merlin HC.4", shortName = "Merlin HC.4", squadron = "845 NAS", isDefault = true, pts = 0, qty = 2, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier Transport Helicopter (2x Aircraft)", loadoutid = 21903 },
+        { id = "Mojave_def", type = "Aircraft", dbid = 5696, name = "Mojave UAV", shortName = "Mojave UAV", squadron = "700X NAS", isDefault = true, pts = 0, qty = 2, spawnRP = "HMS Queen Elizabeth", category = "default", group = "Carrier Air Wing (Embarkation)", role = "Carrier Strike/Recon UAV (2x Drones)", loadoutid = 30519 },
 
         -- Default RAF (0 pts)
-        { id = "Poseidon_def",        type = "Aircraft",  dbid = 4940, name = "P-8 Poseidon MRA.1",        isDefault = true, pts = 0,       qty = 2,                          spawnRP = "W8V2DT-0HNODCG173JA6", category = "default",  group = "RAF Theater Air Support",                            role = "Maritime Patrol (RAF Lossiemouth - 2x Aircraft)",     loadoutid = 27683 },
-        { id = "Voyager_def",         type = "Aircraft",  dbid = 8072, name = "Airbus Voyager KC.3",       isDefault = true, pts = 0,       qty = 4,                          spawnRP = "W8V2DT-0HNODCG173J98", category = "default",  group = "RAF Theater Air Support",                            role = "Strategic Tanker (RAF Brize Norton - 4x Aircraft)",   loadoutid = 10562 },
-        { id = "Globemaster_def",     type = "Aircraft",  dbid = 4275, name = "C-17A Globemaster III",     isDefault = true, pts = 0,       qty = 4,                          spawnRP = "W8V2DT-0HNODCG173J98", category = "default",  group = "RAF Theater Air Support",                            role = "Heavy Transport (RAF Brize Norton - 4x Aircraft)",    loadoutid = 21908 },
-        { id = "Atlas_def",           type = "Aircraft",  dbid = 1420, name = "A400M Atlas C.1",           isDefault = true, pts = 0,       qty = 10,                         spawnRP = "W8V2DT-0HNODCG173J98", category = "default",  group = "RAF Theater Air Support",                            role = "Tactical Transport (RAF Brize Norton - 10x Aircraft)", loadoutid = 13775 },
-        { id = "Protector_def",       type = "Aircraft",  dbid = 4724, name = "Protector RG.1",            isDefault = true, pts = 0,       qty = 1,                          spawnRP = "W8V2DT-0HNODCG173JC2", category = "default",  group = "RAF Theater Air Support",                            role = "Strategic UAV (RAF Marham - 1x Drone)",            loadoutid = 13989 },
+        { id = "Poseidon_def", type = "Aircraft", dbid = 4940, name = "P-8 Poseidon MRA.1", shortName = "Poseidon MRA.1", squadron = "120 Sqn", isDefault = true, pts = 0, qty = 2, spawnRP = "W8V2DT-0HNODCG173JA6", category = "default", group = "RAF Theater Air Support", role = "Maritime Patrol (RAF Lossiemouth - 2x Aircraft)", loadoutid = 27683 },
+        { id = "Voyager_def", type = "Aircraft", dbid = 8072, name = "Airbus Voyager KC.3", shortName = "Voyager KC.3", squadron = "10 Sqn", isDefault = true, pts = 0, qty = 4, spawnRP = "W8V2DT-0HNODCG173J98", category = "default", group = "RAF Theater Air Support", role = "Strategic Tanker (RAF Brize Norton - 4x Aircraft)", loadoutid = 10562 },
+        { id = "Globemaster_def", type = "Aircraft", dbid = 4275, name = "C-17A Globemaster III", shortName = "Globemaster III", squadron = "99 Sqn", isDefault = true, pts = 0, qty = 4, spawnRP = "W8V2DT-0HNODCG173J98", category = "default", group = "RAF Theater Air Support", role = "Heavy Transport (RAF Brize Norton - 4x Aircraft)", loadoutid = 21908 },
+        { id = "Atlas_def", type = "Aircraft", dbid = 1420, name = "A400M Atlas C.1", shortName = "Atlas C.1", squadron = "70 Sqn", isDefault = true, pts = 0, qty = 10, spawnRP = "W8V2DT-0HNODCG173J98", category = "default", group = "RAF Theater Air Support", role = "Tactical Transport (RAF Brize Norton - 10x Aircraft)", loadoutid = 13775 },
+        { id = "Protector_def", type = "Aircraft", dbid = 4724, name = "Protector RG.1", shortName = "Protector RG.1", squadron = "31 Sqn", isDefault = true, pts = 0, qty = 1, spawnRP = "W8V2DT-0HNODCG173JC2", category = "default", group = "RAF Theater Air Support", role = "Strategic UAV (RAF Marham - 1x Drone)", loadoutid = 13989 },
 
         -- Escorts & Submarines
-        { id = "Somerset",            type = "Ship",      dbid = 3199, name = "HMS Somerset",              pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Type 23 ASW Frigates",                        role = "Type 23 ASW Frigate",                    upgradeCost = 1 },
-        { id = "Sutherland",          type = "Ship",      dbid = 3199, name = "HMS Sutherland",            pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Type 23 ASW Frigates",                        role = "Type 23 ASW Frigate",                    upgradeCost = 1 },
-        { id = "Kent",                type = "Ship",      dbid = 3199, name = "HMS Kent",                  pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Type 23 ASW Frigates",                        role = "Type 23 ASW Frigate",                    upgradeCost = 1 },
-        { id = "Portland",            type = "Ship",      dbid = 3199, name = "HMS Portland",              pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Type 23 ASW Frigates",                        role = "Type 23 ASW Frigate",                    upgradeCost = 1 },
-        { id = "Dauntless",           type = "Ship",      dbid = 3200, name = "HMS Dauntless",             pts = 7,          maxLimit = 1,  spawnRP = "FLEET_SPAWN2",         category = "escorts",  group = "Type 45 Air Defense Destroyers",              role = "Type 45 Destroyer (Standard)",           upgradeCost = 1 },
-        { id = "Diamond",             type = "Ship",      dbid = 3438, name = "HMS Diamond",               pts = 10,         maxLimit = 1,  spawnRP = "FLEET_SPAWN2",         category = "escorts",  group = "Type 45 Air Defense Destroyers",              role = "Type 45 Destroyer (Sea Ceptor Upgrade)", upgradeCost = 1 },
-        { id = "Dragon",              type = "Ship",      dbid = 3200, name = "HMS Dragon",                pts = 7,          maxLimit = 1,  spawnRP = "FLEET_SPAWN2",         category = "escorts",  group = "Type 45 Air Defense Destroyers",              role = "Type 45 Destroyer (Standard)",           upgradeCost = 1 },
-        { id = "Defender",            type = "Ship",      dbid = 3438, name = "HMS Defender",              pts = 10,         maxLimit = 1,  spawnRP = "FLEET_SPAWN2",         category = "escorts",  group = "Type 45 Air Defense Destroyers",              role = "Type 45 Destroyer (Sea Ceptor Upgrade)", upgradeCost = 1 },
-        { id = "Venturer",            type = "Ship",      dbid = 2795, name = "HMS Venturer",              pts = 3,          maxLimit = 1,  spawnRP = "FLEET_SPAWN2",         category = "escorts",  group = "Next-Generation Frigates (Type 26 & Type 31)", role = "Type 31 General Purpose Frigate",        upgradeCost = 1 },
-        { id = "Glasgow",             type = "Ship",      dbid = 2795, name = "HMS Glasgow",               pts = 7,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Next-Generation Frigates (Type 26 & Type 31)", role = "Type 26 Advanced ASW Frigate",           upgradeCost = 1 },
-        { id = "Agamemnon",           type = "Submarine", dbid = 725,  name = "HMS Agamemnon",             pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Subsurface Fleet (Astute-Class SSN)",         role = "Astute-Class Nuclear Submarine" },
-        { id = "Anson",               type = "Submarine", dbid = 725,  name = "HMS Anson",                 pts = 5,          maxLimit = 1,  spawnRP = "FLEET_SPAWN4",         category = "escorts",  group = "Subsurface Fleet (Astute-Class SSN)",         role = "Astute-Class Nuclear Submarine" },
+        { id = "Somerset", type = "Ship", dbid = 3199, name = "HMS Somerset", pts = 5, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "escorts", group = "Type 23 ASW Frigates", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Sutherland", type = "Ship", dbid = 3199, name = "HMS Sutherland", pts = 5, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "escorts", group = "Type 23 ASW Frigates", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Kent", type = "Ship", dbid = 3199, name = "HMS Kent", pts = 5, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "escorts", group = "Type 23 ASW Frigates", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Portland", type = "Ship", dbid = 3199, name = "HMS Portland", pts = 5, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "escorts", group = "Type 23 ASW Frigates", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Dauntless", type = "Ship", dbid = 3200, name = "HMS Dauntless", pts = 7, maxLimit = 1, spawnRP = "BASE_PORTSMOUTH", category = "escorts", group = "Type 45 Air Defense Destroyers", role = "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Diamond", type = "Ship", dbid = 3438, name = "HMS Diamond", pts = 10, maxLimit = 1, spawnRP = "BASE_PORTSMOUTH", category = "escorts", group = "Type 45 Air Defense Destroyers", role = "Type 45 Destroyer (Sea Ceptor - 1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Dragon", type = "Ship", dbid = 3200, name = "HMS Dragon", pts = 7, maxLimit = 1, spawnRP = "BASE_PORTSMOUTH", category = "escorts", group = "Type 45 Air Defense Destroyers", role = "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Defender", type = "Ship", dbid = 3438, name = "HMS Defender", pts = 10, maxLimit = 1, spawnRP = "BASE_PORTSMOUTH", category = "escorts", group = "Type 45 Air Defense Destroyers", role = "Type 45 Destroyer (Sea Ceptor - 1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Venturer", type = "Ship", dbid = 3271, name = "HMS Venturer", pts = 3, maxLimit = 1, spawnRP = "BASE_ROSYTH", category = "escorts", group = "Next-Generation Frigates (Type 26 & Type 31)", role = "Type 31 General Purpose Frigate (1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Glasgow", type = "Ship", dbid = 2795, name = "HMS Glasgow", pts = 7, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "escorts", group = "Next-Generation Frigates (Type 26 & Type 31)", role = "Type 26 Advanced ASW Frigate (1x Wildcat, 1x Proteus & 2x Peregrine)", upgradeCost = 2 },
+        { id = "Agamemnon", type = "Submarine", dbid = 725, name = "HMS Agamemnon", pts = 5, maxLimit = 1, spawnRP = "BASE_CLYDE", category = "escorts", group = "Subsurface Fleet (Astute-Class SSN)", role = "Astute-Class Nuclear Submarine" },
+        { id = "Anson", type = "Submarine", dbid = 725, name = "HMS Anson", pts = 5, maxLimit = 1, spawnRP = "BASE_CLYDE", category = "escorts", group = "Subsurface Fleet (Astute-Class SSN)", role = "Astute-Class Nuclear Submarine" },
 
         -- Support & Auxiliary
-        { id = "Tidespring",          type = "Ship",      dbid = 2581, name = "RFA Tidespring",            pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Tide-Class & Fleet Replenishment (AOR)",      role = "Tide-class Replenishment Tanker" },
-        { id = "Tiderace",            type = "Ship",      dbid = 2581, name = "RFA Tiderace",              pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Tide-Class & Fleet Replenishment (AOR)",      role = "Tide-class Replenishment Tanker" },
-        { id = "Tidesurge",           type = "Ship",      dbid = 2581, name = "RFA Tidesurge",             pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Tide-Class & Fleet Replenishment (AOR)",      role = "Tide-class Replenishment Tanker" },
-        { id = "FortVictoria",        type = "Ship",      dbid = 406,  name = "RFA Fort Victoria",         pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Tide-Class & Fleet Replenishment (AOR)",      role = "AOR Fleet Replenishment Vessel" },
-        { id = "MountsBay",           type = "Ship",      dbid = 1451, name = "RFA Mounts Bay",            pts = 3,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Bay-Class Amphibious Landing Ships",          role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-        { id = "CardiganBay",         type = "Ship",      dbid = 1451, name = "RFA Cardigan Bay",          pts = 3,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Bay-Class Amphibious Landing Ships",          role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-        { id = "HurstPoint",          type = "Ship",      dbid = 2423, name = "MV Hurst Point",            pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "Point-Class Strategic Sealift (Ro-Ro)",       role = "STUFT Strategic Ro-Ro Cargo" },
-        { id = "Eddystone",           type = "Ship",      dbid = 2423, name = "MV Eddystone",              pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "Point-Class Strategic Sealift (Ro-Ro)",       role = "STUFT Strategic Ro-Ro Cargo" },
-        { id = "HartlandPoint",       type = "Ship",      dbid = 2423, name = "MV Hartland Point",         pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "Point-Class Strategic Sealift (Ro-Ro)",       role = "STUFT Strategic Ro-Ro Cargo" },
-        { id = "AnvilPoint",          type = "Ship",      dbid = 2423, name = "MV Anvil Point",            pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "Point-Class Strategic Sealift (Ro-Ro)",       role = "STUFT Strategic Ro-Ro Cargo" },
-        { id = "WaveKnight",          type = "Ship",      dbid = 1406, name = "RFA Wave Knight",           pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Wave-Class Fast Fleet Tankers",               role = "Wave-class Fast Fleet Tanker" },
-        { id = "WaveRuler",           type = "Ship",      dbid = 1406, name = "RFA Wave Ruler",            pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN3",         category = "support",  group = "Wave-Class Fast Fleet Tankers",               role = "Wave-class Fast Fleet Tanker" },
-        { id = "Canberra",            type = "Ship",      dbid = 2024, name = "MV Canberra",               pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "STUFT Transports & Commercial Charters",       role = "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
-        { id = "QueenVictoria",       type = "Ship",      dbid = 2024, name = "MV Queen Victoria",          pts = 2,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "STUFT Transports & Commercial Charters",       role = "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
-        { id = "LeanderFisher",       type = "Ship",      dbid = 144,  name = "MV Leander Fisher",         pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "STUFT Transports & Commercial Charters",       role = "Chartered Coastal Tanker" },
-        { id = "FureVanguard",        type = "Ship",      dbid = 144,  name = "MV Fure Vanguard",          pts = 1,          maxLimit = 1,  spawnRP = "FLEET_SPAWN5",         category = "support",  group = "STUFT Transports & Commercial Charters",       role = "Chartered Coastal Tanker" },
+        { id = "Tidespring", type = "Ship", dbid = 2581, name = "RFA Tidespring", pts = 2, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Tide-Class & Fleet Replenishment (AOR)", role = "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+        { id = "Tiderace", type = "Ship", dbid = 2581, name = "RFA Tiderace", pts = 2, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Tide-Class & Fleet Replenishment (AOR)", role = "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+        { id = "Tidesurge", type = "Ship", dbid = 2581, name = "RFA Tidesurge", pts = 2, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Tide-Class & Fleet Replenishment (AOR)", role = "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+        { id = "FortVictoria", type = "Ship", dbid = 406, name = "RFA Fort Victoria", pts = 2, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Tide-Class & Fleet Replenishment (AOR)", role = "AOR Fleet Replenishment (1x Merlin, 1x HC.4 & 1x Peregrine)" },
+        { id = "MountsBay", type = "Ship", dbid = 1451, name = "RFA Mounts Bay", pts = 3, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "support", group = "Bay-Class Amphibious Landing Ships", role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+        { id = "CardiganBay", type = "Ship", dbid = 1451, name = "RFA Cardigan Bay", pts = 3, maxLimit = 1, spawnRP = "BASE_DEVONPORT", category = "support", group = "Bay-Class Amphibious Landing Ships", role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+        { id = "HurstPoint", type = "Ship", dbid = 2423, name = "MV Hurst Point", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "Point-Class Strategic Sealift (Ro-Ro)", role = "STUFT Strategic Ro-Ro Cargo" },
+        { id = "Eddystone", type = "Ship", dbid = 2423, name = "MV Eddystone", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "Point-Class Strategic Sealift (Ro-Ro)", role = "STUFT Strategic Ro-Ro Cargo" },
+        { id = "HartlandPoint", type = "Ship", dbid = 2423, name = "MV Hartland Point", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "Point-Class Strategic Sealift (Ro-Ro)", role = "STUFT Strategic Ro-Ro Cargo" },
+        { id = "AnvilPoint", type = "Ship", dbid = 2423, name = "MV Anvil Point", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "Point-Class Strategic Sealift (Ro-Ro)", role = "STUFT Strategic Ro-Ro Cargo" },
+        { id = "WaveKnight", type = "Ship", dbid = 1406, name = "RFA Wave Knight", pts = 1, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Wave-Class Fast Fleet Tankers", role = "Wave-class Fast Fleet Tanker" },
+        { id = "WaveRuler", type = "Ship", dbid = 1406, name = "RFA Wave Ruler", pts = 1, maxLimit = 1, spawnRP = "BASE_PORTLAND", category = "support", group = "Wave-Class Fast Fleet Tankers", role = "Wave-class Fast Fleet Tanker" },
+        { id = "Canberra", type = "Ship", dbid = 2024, name = "MV Canberra", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "STUFT Transports & Commercial Charters", role = "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+        { id = "QueenVictoria", type = "Ship", dbid = 2024, name = "MV Queen Victoria", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "STUFT Transports & Commercial Charters", role = "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+        { id = "LeanderFisher", type = "Ship", dbid = 144, name = "MV Leander Fisher", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "STUFT Transports & Commercial Charters", role = "Chartered Coastal Tanker" },
+        { id = "FureVanguard", type = "Ship", dbid = 144, name = "MV Fure Vanguard", pts = 1, maxLimit = 1, spawnRP = "BASE_MARCHWOOD", category = "support", group = "STUFT Transports & Commercial Charters", role = "Chartered Coastal Tanker" },
 
         -- Carrier Air Wing
-        { id = "F35B_add",            type = "Aircraft",  dbid = 1095, name = "F-35B Lightning II",        pts = 20,         maxLimit = 1,  spawnQty = 12,                    spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Carrier Strike & Naval Air Wing",                     role = "Carrier Strike Fighter (2nd Squadron - 12x Aircraft)", loadoutid = 25647 },
-        { id = "Wildcat_add",         type = "Aircraft",  dbid = 6786, name = "Wildcat HMA.2",             pts = 1,          maxLimit = 6,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Carrier Strike & Naval Air Wing",                     role = "Carrier ASW/Utility Helicopter",         loadoutid = 17706 },
-        { id = "Crowsnest_add",       type = "Aircraft",  dbid = 4110, name = "Merlin ASaC.5 Crowsnest",   pts = 1,          maxLimit = 2,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Carrier Strike & Naval Air Wing",                     role = "Carrier AEW Helicopter",                 loadoutid = 8559 },
-        { id = "MerlinHC4_add",       type = "Aircraft",  dbid = 4273, name = "Merlin HC.4",               pts = 1,          maxLimit = 4,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Carrier Strike & Naval Air Wing",                     role = "Carrier Commando Transport",             loadoutid = 21903 },
-        { id = "ScanEagle_add",       type = "Aircraft",  dbid = 4292, name = "ScanEagle UAV",             pts = 1,          maxLimit = 10, spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Carrier Strike & Naval Air Wing",                     role = "Shipboard Reconnaissance UAV",           loadoutid = 17672 },
-        { id = "Apache_add_carrier",  type = "Aircraft",  dbid = 4842, name = "Apache AH.Mk.2",            pts = 1,          maxLimit = 6,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Joint Expeditionary Aviation (Army / Commando)",      role = "Army Attack Helicopter (Carrier)",       loadoutid = 30355 },
-        { id = "Chinook_add_carrier", type = "Aircraft",  dbid = 5293, name = "Chinook H-47",              pts = 1,          maxLimit = 4,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Joint Expeditionary Aviation (Army / Commando)",      role = "Heavy Transport Helicopter (Carrier)",   loadoutid = 29481 },
-        { id = "WildcatAH1_add",      type = "Aircraft",  dbid = 3373, name = "Wildcat AH1",               pts = 1,          maxLimit = 4,  spawnRP = "HMS Queen Elizabeth",  category = "airwing",  group = "Joint Expeditionary Aviation (Army / Commando)",      role = "Army Tactical Utility (847 Sq.)",        loadoutid = 17710 },
+        { id = "F35B_add", type = "Aircraft", dbid = 1095, name = "F-35B Lightning II", shortName = "F-35B Lightning II", squadron = "809 NAS", pts = 20, maxLimit = 1, spawnQty = 12, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier Strike Fighter (2nd Squadron - 12x Aircraft)", loadoutid = 25647 },
+        { id = "Wildcat_add", type = "Aircraft", dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", pts = 1, maxLimit = 8, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier ASW/Utility Helicopter", loadoutid = 17706 },
+        { id = "Crowsnest_add", type = "Aircraft", dbid = 4110, name = "Merlin ASaC.5 Crowsnest", shortName = "Merlin ASaC.5 Crowsnest", squadron = "820 NAS", pts = 1, maxLimit = 4, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier AEW Helicopter", loadoutid = 8559 },
+        { id = "MerlinHC4_add", type = "Aircraft", dbid = 4273, name = "Merlin HC.4", shortName = "Merlin HC.4", squadron = "845 NAS", pts = 1, maxLimit = 6, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier Commando Transport", loadoutid = 21903 },
+        { id = "Mojave_add", type = "Aircraft", dbid = 5696, name = "Mojave UAV", shortName = "Mojave UAV", squadron = "700X NAS", pts = 1, maxLimit = 4, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier Strike/Recon UAV", loadoutid = 30519 },
+        { id = "Peregrine_add", type = "Aircraft", dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", pts = 1, maxLimit = 1, spawnQty = 4, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Carrier Strike & Naval Air Wing", role = "Carrier Recon UAV Flight (4x Drones)", loadoutid = 16924 },
+        { id = "Apache_add_carrier", type = "Aircraft", dbid = 4842, name = "Apache AH.Mk.2", shortName = "Apache AH.Mk.2", squadron = "656 Sqn AAC", pts = 1, maxLimit = 6, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Joint Expeditionary Aviation (Army / Commando)", role = "Army Attack Helicopter (Carrier)", loadoutid = 30355 },
+        { id = "Chinook_add_carrier", type = "Aircraft", dbid = 5293, name = "Chinook H-47", shortName = "Chinook H-47", squadron = "27 Sqn", pts = 1, maxLimit = 4, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Joint Expeditionary Aviation (Army / Commando)", role = "Heavy Transport Helicopter (Carrier)", loadoutid = 29485 },
+        { id = "WildcatAH1_add", type = "Aircraft", dbid = 3373, name = "Wildcat AH1", shortName = "Wildcat AH1", squadron = "847 NAS", pts = 1, maxLimit = 4, spawnRP = "HMS Queen Elizabeth", category = "airwing", group = "Joint Expeditionary Aviation (Army / Commando)", role = "Army Tactical Utility (847 Sq.)", loadoutid = 17710 },
 
         -- RAF
-        { id = "Wedgetail_add",       type = "Aircraft",  dbid = 4941, name = "E-7A Wedgetail AEW.1",      pts = 4,          maxLimit = 1,  spawnRP = "W8V2DT-0HNODCG173J98", category = "raf",      group = "Intelligence, Surveillance & Reconnaissance (ISR)",   role = "AEW&C (Brize Norton)",                   loadoutid = 27687 },
-        { id = "RivetJoint_add",      type = "Aircraft",  dbid = 5834, name = "RC-135W Rivet Joint",       pts = 4,          maxLimit = 1,  spawnRP = "W8V2DT-0HNODCG173J98", category = "raf",      group = "Intelligence, Surveillance & Reconnaissance (ISR)",   role = "SIGINT/ESM (Brize Norton)",              loadoutid = 8825 },
-        { id = "Poseidon_add",        type = "Aircraft",  dbid = 4940, name = "P-8 Poseidon MRA.1",        pts = 2,          maxLimit = 4,  spawnRP = "W8V2DT-0HNODCG173JA6", category = "raf",      group = "Intelligence, Surveillance & Reconnaissance (ISR)",   role = "Maritime Patrol (Lossiemouth)",          loadoutid = 27683 },
-        { id = "Protector_add",       type = "Aircraft",  dbid = 4724, name = "Protector RG.1",            pts = 1,          maxLimit = 5,  spawnRP = "W8V2DT-0HNODCG173JC2", category = "raf",      group = "Intelligence, Surveillance & Reconnaissance (ISR)",   role = "Strategic MALE UAV (Marham)",            loadoutid = 13989 },
-        { id = "Voyager_add",         type = "Aircraft",  dbid = 8072, name = "Airbus Voyager KC.3",       pts = 1,          maxLimit = 8,  spawnRP = "W8V2DT-0HNODCG173J98", category = "raf",      group = "Strategic Tankers & Air Transport",                   role = "Strategic Tanker (Brize Norton)",        loadoutid = 10562 },
-        { id = "Globemaster_add",     type = "Aircraft",  dbid = 4275, name = "C-17A Globemaster III",     pts = 1,          maxLimit = 4,  spawnRP = "W8V2DT-0HNODCG173J98", category = "raf",      group = "Strategic Tankers & Air Transport",                   role = "Strategic Transport (Brize Norton)",     loadoutid = 21908 },
-        { id = "Atlas_add",           type = "Aircraft",  dbid = 1420, name = "A400M Atlas C.1",           pts = 1,          maxLimit = 10, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf",      group = "Strategic Tankers & Air Transport",                   role = "Tactical Transport (Brize Norton)",      loadoutid = 13775 },
-        { id = "Chinook_add_bay",     type = "Aircraft",  dbid = 5293, name = "Chinook H-47",              pts = 1,          maxLimit = 6,  spawnRP = "RFA Lyme Bay",         category = "raf",      group = "Forward Expeditionary Aviation (Bay-Class Embarked)", role = "Amphibious Heavy Lift (Bay-class)",      loadoutid = 29481 },
-        { id = "Apache_add_bay",      type = "Aircraft",  dbid = 4842, name = "Apache AH.Mk.2",            pts = 1,          maxLimit = 4,  spawnRP = "RFA Lyme Bay",         category = "raf",      group = "Forward Expeditionary Aviation (Bay-Class Embarked)", role = "Amphibious Strike (Bay-class)",          loadoutid = 30355 }
+        { id = "Wedgetail_add", type = "Aircraft", dbid = 4941, name = "E-7A Wedgetail AEW.1", shortName = "Wedgetail AEW.1", squadron = "8 Sqn", pts = 4, maxLimit = 1, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf", group = "Intelligence, Surveillance & Reconnaissance (ISR)", role = "AEW&C (Brize Norton)", loadoutid = 27687 },
+        { id = "RivetJoint_add", type = "Aircraft", dbid = 5834, name = "RC-135W Rivet Joint", shortName = "Rivet Joint", squadron = "51 Sqn", pts = 4, maxLimit = 1, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf", group = "Intelligence, Surveillance & Reconnaissance (ISR)", role = "SIGINT/ESM (Brize Norton)", loadoutid = 8825 },
+        { id = "Poseidon_add", type = "Aircraft", dbid = 4940, name = "P-8 Poseidon MRA.1", shortName = "Poseidon MRA.1", squadron = "120 Sqn", pts = 2, maxLimit = 4, spawnRP = "W8V2DT-0HNODCG173JA6", category = "raf", group = "Intelligence, Surveillance & Reconnaissance (ISR)", role = "Maritime Patrol (Lossiemouth)", loadoutid = 27683 },
+        { id = "Protector_add", type = "Aircraft", dbid = 4724, name = "Protector RG.1", shortName = "Protector RG.1", squadron = "31 Sqn", pts = 1, maxLimit = 5, spawnRP = "W8V2DT-0HNODCG173JC2", category = "raf", group = "Intelligence, Surveillance & Reconnaissance (ISR)", role = "Strategic MALE UAV (Marham)", loadoutid = 13989 },
+        { id = "Voyager_add", type = "Aircraft", dbid = 8072, name = "Airbus Voyager KC.3", shortName = "Voyager KC.3", squadron = "10 Sqn", pts = 1, maxLimit = 8, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf", group = "Strategic Tankers & Air Transport", role = "Strategic Tanker (Brize Norton)", loadoutid = 10562 },
+        { id = "Globemaster_add", type = "Aircraft", dbid = 4275, name = "C-17A Globemaster III", shortName = "Globemaster III", squadron = "99 Sqn", pts = 1, maxLimit = 4, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf", group = "Strategic Tankers & Air Transport", role = "Strategic Transport (Brize Norton)", loadoutid = 21908 },
+        { id = "Atlas_add", type = "Aircraft", dbid = 1420, name = "A400M Atlas C.1", shortName = "Atlas C.1", squadron = "70 Sqn", pts = 1, maxLimit = 10, spawnRP = "W8V2DT-0HNODCG173J98", category = "raf", group = "Strategic Tankers & Air Transport", role = "Tactical Transport (Brize Norton)", loadoutid = 13775 },
+        { id = "Chinook_add_bay", type = "Aircraft", dbid = 5293, name = "Chinook H-47", shortName = "Chinook H-47", squadron = "27 Sqn", pts = 1, maxLimit = 6, spawnRP = "RFA Lyme Bay", category = "raf", group = "Forward Expeditionary Aviation (Bay-Class Embarked)", role = "Amphibious Heavy Lift (Bay-class)", loadoutid = 29485 },
+        { id = "Apache_add_bay", type = "Aircraft", dbid = 4842, name = "Apache AH.Mk.2", shortName = "Apache AH.Mk.2", squadron = "656 Sqn AAC", pts = 1, maxLimit = 4, spawnRP = "RFA Lyme Bay", category = "raf", group = "Forward Expeditionary Aviation (Bay-Class Embarked)", role = "Amphibious Strike (Bay-class)", loadoutid = 30355 }
     }
 }
 
@@ -279,6 +281,256 @@ local MODEL_MAP = {}
 for _, item in ipairs(CTFS.MODEL.items) do
     MODEL_MAP[item.id] = item
     MODEL_MAP[item.name] = item
+end
+
+-- =============================================================================
+-- EMBARKED SHIP AVIATION COMPLEMENTS (Helicopters & UAVs)
+-- Automatically spawned and hosted aboard surface combatants and auxiliaries
+-- =============================================================================
+CTFS.SHIP_AIRCRAFT = {
+    -- Type 23 Frigates (1x Merlin HM.2, 2x Camcopter S-100 Peregrine)
+    ["HMS St Albans"]     = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Somerset"]      = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Sutherland"]    = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Kent"]          = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Portland"]      = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+
+    -- Type 45 Destroyers (1x Wildcat HMA.2, 2x Camcopter S-100 Peregrine)
+    ["HMS Daring"]        = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Dauntless"]     = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Diamond"]       = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Dragon"]        = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["HMS Defender"]      = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+
+    -- Type 31 General Purpose Frigate (1x Wildcat HMA.2, 2x Camcopter S-100 Peregrine)
+    ["HMS Venturer"]      = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+
+    -- Type 26 Advanced ASW Frigate (1x Wildcat HMA.2, 1x Proteus RWUAS, 2x Camcopter S-100 Peregrine)
+    ["HMS Glasgow"]       = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 7662, name = "Proteus RWUAS", shortName = "Proteus RWUAS", squadron = "700X NAS", loadoutid = 34969, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+
+    -- Bay-Class Amphibious LSD(A) (1x Chinook H-47, 4x RQ-20B Puma UAV)
+    ["RFA Lyme Bay"]      = { { dbid = 5293, name = "Chinook H-47", shortName = "Chinook H-47", squadron = "27 Sqn", loadoutid = 29485, qty = 1 }, { dbid = 6787, name = "RQ-20B Puma AE II", shortName = "Puma UAV", squadron = "700X NAS", loadoutid = 29969, qty = 4 } },
+    ["RFA Mounts Bay"]    = { { dbid = 5293, name = "Chinook H-47", shortName = "Chinook H-47", squadron = "27 Sqn", loadoutid = 29485, qty = 1 }, { dbid = 6787, name = "RQ-20B Puma AE II", shortName = "Puma UAV", squadron = "700X NAS", loadoutid = 29969, qty = 4 } },
+    ["RFA Cardigan Bay"]  = { { dbid = 5293, name = "Chinook H-47", shortName = "Chinook H-47", squadron = "27 Sqn", loadoutid = 29485, qty = 1 }, { dbid = 6787, name = "RQ-20B Puma AE II", shortName = "Puma UAV", squadron = "700X NAS", loadoutid = 29969, qty = 4 } },
+
+    -- Tide-Class Fast Fleet Replenishment Tankers (1x Wildcat HMA.2, 2x Malloy T150 Cargo Drones)
+    ["RFA Tideforce"]     = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 7575, name = "Malloy T150 Cargo Drone", shortName = "Malloy T150", squadron = "700X NAS", loadoutid = 30885, qty = 2 } },
+    ["RFA Tidespring"]    = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 7575, name = "Malloy T150 Cargo Drone", shortName = "Malloy T150", squadron = "700X NAS", loadoutid = 30885, qty = 2 } },
+    ["RFA Tiderace"]      = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 7575, name = "Malloy T150 Cargo Drone", shortName = "Malloy T150", squadron = "700X NAS", loadoutid = 30885, qty = 2 } },
+    ["RFA Tidesurge"]     = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 7575, name = "Malloy T150 Cargo Drone", shortName = "Malloy T150", squadron = "700X NAS", loadoutid = 30885, qty = 2 } },
+
+    -- Wave-Class Fast Fleet Tankers (1x Wildcat HMA.2, 2x Camcopter S-100 Peregrine)
+    ["RFA Wave Knight"]   = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+    ["RFA Wave Ruler"]    = { { dbid = 6786, name = "Wildcat HMA.2", shortName = "Wildcat HMA.2", squadron = "815 NAS", loadoutid = 17706, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } },
+
+    -- AOR Fleet Replenishment (1x Merlin HM.2, 1x Merlin HC.4, 1x Camcopter S-100 Peregrine)
+    ["RFA Fort Victoria"] = { { dbid = 3336, name = "Merlin HM.2", shortName = "Merlin HM.2", squadron = "814 NAS", loadoutid = 8559, qty = 1 }, { dbid = 4273, name = "Merlin HC.4", shortName = "Merlin HC.4", squadron = "845 NAS", loadoutid = 21903, qty = 1 }, { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 1 } },
+
+    -- River-Class Batch 2 OPV (2x Camcopter S-100 Peregrine)
+    ["HMS Medway"]        = { { dbid = 6688, name = "Camcopter S-100 Peregrine", shortName = "Peregrine UAV", squadron = "700X NAS", loadoutid = 16924, qty = 2 } }
+}
+
+-- Authentic UK Naval Base Staging Reference Points
+CTFS.BASE_STAGING_RPS = {
+    Portsmouth = "BASE_PORTSMOUTH",
+    Devonport  = "BASE_DEVONPORT",
+    Rosyth     = "BASE_ROSYTH",
+    Clyde      = "BASE_CLYDE",
+    Portland   = "BASE_PORTLAND",
+    Marchwood  = "BASE_MARCHWOOD"
+}
+
+-- Authentic Airbase Human Display Names for Uniform Aviation Naming
+CTFS.AIRBASE_DISPLAY_NAMES = {
+    ["W8V2DT-0HNODCG173JA6"] = "RAF Lossiemouth",
+    ["W8V2DT-0HNODCG173J98"] = "RAF Brize Norton",
+    ["W8V2DT-0HNODCG173JC2"] = "RAF Marham"
+}
+
+-- Standardized Aircraft Naming Generator: "<Host> <ShortName> (<Squadron>) #<Num>"
+local function FormatAircraftName(hostName, shortName, squadron, curNum, totalNum)
+    local baseStr = hostName .. " " .. shortName
+    if squadron and squadron ~= "" then
+        baseStr = baseStr .. " (" .. squadron .. ")"
+    end
+    if totalNum and totalNum > 1 then
+        return baseStr .. " #" .. curNum
+    else
+        return baseStr
+    end
+end
+
+-- Safe RP coordinate resolution with graceful fallbacks (RP -> FLEET_SPAWN1..5 -> coordinates)
+local function ResolveSpawnCoords(targetRP, fallbackRP)
+    local rp = nil
+    if targetRP and targetRP ~= "" then
+        pcall(function()
+            rp = ScenEdit_GetReferencePoint({ side = "UK", name = targetRP })
+        end)
+    end
+    if not rp and fallbackRP and fallbackRP ~= "" then
+        pcall(function()
+            rp = ScenEdit_GetReferencePoint({ side = "UK", name = fallbackRP })
+        end)
+    end
+    if not rp then
+        for s = 1, 5 do
+            pcall(function()
+                rp = ScenEdit_GetReferencePoint({ side = "UK", name = "FLEET_SPAWN" .. s })
+            end)
+            if rp then break end
+        end
+    end
+    if rp then
+        return rp.latitude, rp.longitude
+    end
+    return "-50.0000", "-50.0000"
+end
+
+-- =============================================================================
+-- WEAPON MAGAZINE & VLS SILO CONFIGURATION ENGINES
+-- =============================================================================
+function CTFS.ConfigureShipVLS(unit, hasVlsUpgrade)
+    if not unit then return end
+    if unit.guid then
+        local refreshed = ScenEdit_GetUnit({ guid = unit.guid })
+        if refreshed then unit = refreshed end
+    end
+    if not unit.mounts then return end
+
+    -- Full VLS upgrade (+2 pts) retains 100% full silos as spawned by CMO
+    if hasVlsUpgrade then return end
+
+    -- Peacetime loadout: reduce VLS silos to ~25% capacity.
+    -- In CMO, ScenEdit_AddReloadsToUnit({ number = N, remove = true }) on a VLS mount
+    -- operates in units of physical SILOS / CELLS (not individual quadpacked missiles).
+    -- If 'number' were specified in raw missile count for a quadpacked mount (e.g. 18 CAMMs on
+    -- a 6-cell mount), CMO would interpret '18' as 18 cells to remove, which exceeds the
+    -- 6-cell capacity and empties the entire launcher to 0/24.
+    --
+    -- Calculation:
+    --   1) Determine physical cell capacity ('cellCount') of the mount.
+    --   2) Determine packing ratio ('multiple' = maxCap / cellCount, e.g. 4 for CAMM).
+    --   3) Calculate target loaded cells: targetCells = math.max(1, math.floor(cellCount * 0.25 + 0.5)).
+    --      - Sea Viper (48 cells, 1 Aster/cell): 12 cells kept (12 missiles) -> remove 36 cells.
+    --      - Sea Ceptor on Type 45 (6 cells, 4 CAMM/cell): 2 cells kept (8 CAMMs) -> remove 4 cells.
+    --      - Sea Ceptor on Type 23 (8 cells, 4 CAMM/cell): 2 cells kept (8 CAMMs) -> remove 6 cells.
+    --      - Sea Ceptor on Type 26 (12 cells, 4 CAMM/cell): 3 cells kept (12 CAMMs) -> remove 9 cells.
+    --      - Mk 41 on Type 26 (24 cells, 1 Tomahawk/cell): 6 cells kept (6 Tomahawks) -> remove 18 cells.
+    local vlsKeywords = { "vls", "sylver", "cell", "silo", "gws", "ceptor", "vertical", "mk 41", "mk41", "aster", "camm" }
+
+    for _, mount in pairs(unit.mounts) do
+        local mName = (mount.mount_name or mount.name or ""):lower()
+        local isVls = false
+        for _, kw in ipairs(vlsKeywords) do
+            if string.find(mName, kw, 1, true) then
+                isVls = true
+                break
+            end
+        end
+
+        local weapons = mount.mount_weapons or mount.weapons
+        if isVls and weapons then
+            -- Determine physical cell capacity of the mount
+            local cellCount = tonumber(mount.mount_capacity) or tonumber(mount.capacity)
+            if not cellCount or cellCount <= 0 then
+                local numStr = mName:match("(%d+)%s*cells?") or mName:match("%[(%d+)%s*cells?%]")
+                if numStr then
+                    cellCount = tonumber(numStr)
+                end
+            end
+
+            for _, w in pairs(weapons) do
+                local wpnDbid = tonumber(w.wpn_dbid)
+                local maxCap = tonumber(w.wpn_maxcap) or tonumber(w.wpn_capacity) or tonumber(w.wpn_current) or 0
+                local current = tonumber(w.wpn_current) or maxCap
+
+                if wpnDbid and maxCap > 0 then
+                    -- Determine quadpacking / multiple ratio
+                    local multiple = 1
+                    if cellCount and cellCount > 0 and maxCap >= cellCount then
+                        multiple = math.floor(maxCap / cellCount)
+                        if multiple < 1 then multiple = 1 end
+                    else
+                        multiple = 1
+                        if not cellCount or cellCount <= 0 then
+                            cellCount = maxCap
+                        end
+                    end
+
+                    -- Calculate current cells and target cells
+                    local currentCells = math.ceil(current / multiple)
+                    local targetCells = math.max(1, math.floor(cellCount * 0.25 + 0.5))
+                    local cellsToRemove = currentCells - targetCells
+
+                    -- Safety clamp: cannot remove more than current loaded cells
+                    if cellsToRemove > currentCells then
+                        cellsToRemove = currentCells
+                    end
+
+                    if cellsToRemove > 0 then
+                        local mountGuid = mount.mount_guid or mount.guid
+                        pcall(function()
+                            ScenEdit_AddReloadsToUnit({
+                                side = unit.side,
+                                guid = unit.guid,
+                                unitname = unit.name,
+                                mount_guid = mountGuid,
+                                wpn_dbid = wpnDbid,
+                                number = cellsToRemove,
+                                remove = true
+                            })
+                        end)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function CTFS.ConfigureCarrierMagazines(carrierUnit, upgradeSteps)
+    if not carrierUnit then return end
+    if carrierUnit.guid then
+        local refreshed = ScenEdit_GetUnit({ guid = carrierUnit.guid })
+        if refreshed then carrierUnit = refreshed end
+    end
+    if not carrierUnit.magazines then return end
+
+    local steps = tonumber(upgradeSteps) or 0
+    if steps > 3 then steps = 3 end
+
+    -- 0 steps = 25% fill (peacetime baseline)
+    -- 1 step  = 50% fill (+4 pts)
+    -- 2 steps = 75% fill (+8 pts)
+    -- 3 steps = 100% fill (+12 pts, full capacity retained)
+    local targetPercent = 25 + (steps * 25)
+    if targetPercent >= 100 then return end
+
+    for _, mag in pairs(carrierUnit.magazines) do
+        local weapons = mag.mag_weapons or mag.weapons
+        if weapons then
+            for _, w in pairs(weapons) do
+                local wpnDbid = tonumber(w.wpn_dbid)
+                local maxCap = tonumber(w.wpn_maxcap) or tonumber(w.wpn_capacity) or tonumber(w.wpn_current) or 0
+                local current = tonumber(w.wpn_current) or maxCap
+                if wpnDbid and maxCap > 0 then
+                    local targetQty = math.floor(maxCap * (targetPercent / 100))
+                    local toRemove = current - targetQty
+                    if toRemove > 0 then
+                        pcall(function()
+                            ScenEdit_AddWeaponToUnitMagazine({
+                                guid = carrierUnit.guid,
+                                mag_guid = mag.mag_guid or mag.guid,
+                                wpn_dbid = wpnDbid,
+                                number = toRemove,
+                                remove = true
+                            })
+                        end)
+                    end
+                end
+            end
+        end
+    end
 end
 
 -- =============================================================================
@@ -390,6 +642,7 @@ function CTFS.VerifyAndCalculateOrder(selections)
     end
 
     -- 1. Verify Requested Units
+    local includedDefaults = {}
     if selections.units and type(selections.units) == "table" then
         for _, req in ipairs(selections.units) do
             local master = MODEL_MAP[req.id] or MODEL_MAP[req.name]
@@ -397,18 +650,23 @@ function CTFS.VerifyAndCalculateOrder(selections)
                 local qty = tonumber(req.qty) or 1
                 if master.isDefault then
                     -- Defaults are mandatory, quantity locked, cost 0
-                    qty = master.qty or 1
-                    table.insert(verifiedUnits, {
-                        id = master.id,
-                        name = master.name,
-                        type = master.type,
-                        dbid = master.dbid,
-                        spawnRP = master.spawnRP,
-                        loadoutid = master.loadoutid,
-                        qty = qty,
-                        pts = 0,
-                        isDefault = true
-                    })
+                    if not includedDefaults[master.id] then
+                        includedDefaults[master.id] = true
+                        qty = master.qty or 1
+                        table.insert(verifiedUnits, {
+                            id = master.id,
+                            name = master.name,
+                            shortName = master.shortName,
+                            squadron = master.squadron,
+                            type = master.type,
+                            dbid = master.dbid,
+                            spawnRP = master.spawnRP,
+                            loadoutid = master.loadoutid,
+                            qty = qty,
+                            pts = 0,
+                            isDefault = true
+                        })
+                    end
                 elseif qty > 0 then
                     -- Enforce max limit
                     local maxLimit = master.maxLimit or 1
@@ -421,6 +679,8 @@ function CTFS.VerifyAndCalculateOrder(selections)
                     table.insert(verifiedUnits, {
                         id = master.id,
                         name = master.name,
+                        shortName = master.shortName,
+                        squadron = master.squadron,
                         type = master.type,
                         dbid = master.dbid,
                         spawnRP = master.spawnRP,
@@ -434,19 +694,46 @@ function CTFS.VerifyAndCalculateOrder(selections)
         end
     end
 
+    -- Ensure all mandatory baseline default assets are included
+    for _, master in ipairs(CTFS.MODEL.items) do
+        if master.isDefault and not includedDefaults[master.id] then
+            includedDefaults[master.id] = true
+            table.insert(verifiedUnits, {
+                id = master.id,
+                name = master.name,
+                shortName = master.shortName,
+                squadron = master.squadron,
+                type = master.type,
+                dbid = master.dbid,
+                spawnRP = master.spawnRP,
+                loadoutid = master.loadoutid,
+                qty = master.qty or 1,
+                pts = 0,
+                isDefault = true
+            })
+        end
+    end
+
     -- 2. Verify Munition/VLS Upgrades
     if selections.upgrades and type(selections.upgrades) == "table" then
         for targetName, percent in pairs(selections.upgrades) do
             local master = MODEL_MAP[targetName]
             if master and master.upgradeCost then
-                local p = tonumber(percent) or 0
-                -- Steps can only be 0, 25, 50, or 75%
-                local steps = math.floor(p / 25)
-                if steps > 3 then steps = 3 end
-                if steps > 0 then
-                    local upgradePoints = steps * master.upgradeCost
-                    totalCalculatedPoints = totalCalculatedPoints + upgradePoints
-                    verifiedUpgrades[master.name] = steps * 25
+                if master.name == "HMS Queen Elizabeth" then
+                    local p = tonumber(percent) or 0
+                    local steps = math.floor(p / 25)
+                    if steps > 3 then steps = 3 end
+                    if steps > 0 then
+                        local upgradePoints = steps * master.upgradeCost
+                        totalCalculatedPoints = totalCalculatedPoints + upgradePoints
+                        verifiedUpgrades[master.name] = steps
+                    end
+                else
+                    -- Surface Warship Full VLS Silos Upgrade (+2 pts)
+                    if percent == true or (tonumber(percent) and tonumber(percent) > 0) then
+                        totalCalculatedPoints = totalCalculatedPoints + master.upgradeCost
+                        verifiedUpgrades[master.name] = true
+                    end
                 end
             end
         end
@@ -611,6 +898,148 @@ function CTFS.ApplyArgentineBoons(points)
 end
 
 -- =============================================================================
+-- THEATRE OPERATIONAL ORDER (OPORD) HTML GENERATOR
+-- Formats authentic British Admiralty / PJHQ Fleet Operational Orders
+-- Rendered natively in the CMO modal dialog and incoming message log
+-- =============================================================================
+function CTFS.GenerateLaunchDispatchHTML(hoursDelayed, daysDelayed, departureDTG, totalPoints, unitCount)
+    local template = [==[<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming message</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 18px;
+            background-color: #060911;
+            color: #cbd5e1;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+    <script>
+        try {
+            window.resizeTo(1100, 800);
+        } catch(e) {}
+    </script>
+</head>
+<body>
+<div style="background-color: #0a101d; color: #cbd5e1; font-family: 'Segoe UI', Arial, sans-serif; padding: 22px; border: 1px solid #1a273f; border-top: 3px solid #00d2ff; border-radius: 6px; width: 100%; max-width: 960px; margin: 0 auto; box-sizing: border-box; box-shadow: 0 8px 32px rgba(0,0,0,0.85);">
+
+    <!-- Header Dispatch Banner -->
+    <table style="width: 100%; border-bottom: 1px solid #1a273f; padding-bottom: 12px; margin-bottom: 16px;">
+        <tr>
+            <td style="vertical-align: top;">
+                <div style="color: #00d2ff; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">MINISTRY OF DEFENCE &bull; PERMANENT JOINT HEADQUARTERS (PJHQ) NORTHWOOD</div>
+                <div style="color: #ffffff; font-size: 17px; font-weight: 800; letter-spacing: 1.5px; margin-top: 4px;">ROYAL NAVY FLEET OPERATIONAL ORDER // OP RECORPORATE</div>
+            </td>
+            <td style="vertical-align: top; text-align: right;">
+                <span style="background-color: rgba(200, 16, 46, 0.2); border: 1px solid #c8102e; color: #ff6b81; font-family: monospace; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 4px; letter-spacing: 1.5px; display: inline-block;">
+                    TOP SECRET // COMMANDER EYES ONLY
+                </span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Telemetry Strip -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; background-color: #0e1626; border: 1px solid #1a273f; border-radius: 4px;">
+        <tr>
+            <td style="padding: 9px 12px; border-right: 1px solid #1a273f; font-size: 11px; color: #8fa3bf;">
+                <strong style="color: #00d2ff;">ORIGINATOR:</strong> CINCFLEET / NORTHWOOD
+            </td>
+            <td style="padding: 9px 12px; border-right: 1px solid #1a273f; font-size: 11px; color: #8fa3bf;">
+                <strong style="color: #00d2ff;">ACTION TO:</strong> CTF 317 (FLAGSHIP HMS QUEEN ELIZABETH)
+            </td>
+            <td style="padding: 9px 12px; border-right: 1px solid #1a273f; font-size: 11px; color: #8fa3bf;">
+                <strong style="color: #00d2ff;">DEPARTURE DTG:</strong> <span style="color: #ffffff; font-weight: bold;">{departureDTG}</span>
+            </td>
+            <td style="padding: 9px 12px; font-size: 11px; color: #8fa3bf;">
+                <strong style="color: #00d2ff;">STAGING DELAY:</strong> <span style="color: #ffffff; font-weight: bold;">{daysDelayed} DAYS ({hoursDelayed} HRS)</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 1. Situation & Mobilisation Report -->
+    <div style="background-color: #0e1626; border: 1px solid #1a273f; border-left: 3px solid #00d2ff; padding: 14px 16px; margin-bottom: 14px; border-radius: 0 4px 4px 0;">
+        <div style="color: #00d2ff; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
+            1. SITUATION &amp; MOBILISATION REPORT
+        </div>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0 0 8px 0; color: #cbd5e1;">
+            Following an operational staging and mobilisation period ({daysDelayed} Days elapsed), Task Force 317 is formally released from home waters and cleared to commence theatre transit for the South Atlantic Joint Operations Area (JOA).
+        </p>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #94a3b8;">
+            <strong style="color: #00d2ff;">INTELLIGENCE ASSESSMENT:</strong> The operational delay required to marshal surface combatants, carrier strike squadrons, and sealift tonnage in UK ports has afforded Argentine Joint Forces crucial strategic breathing room to entrench and reinforce.
+        </p>
+    </div>
+
+    <!-- 2. Theatre Forward Presence -->
+    <div style="background-color: #0e1626; border: 1px solid #1a273f; border-left: 3px solid #00d2ff; padding: 14px 16px; margin-bottom: 14px; border-radius: 0 4px 4px 0;">
+        <div style="color: #00d2ff; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
+            2. THEATRE FORWARD PRESENCE
+        </div>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #cbd5e1;">
+            The River-class Offshore Patrol Vessel <strong style="color: #ffffff;">HMS Medway</strong> is currently forward-deployed in the Falklands sector. Being lightly armed and isolated, <em>Medway</em> has adopted strict emissions control (<strong style="color: #ffffff;">EMCON Alpha</strong>) and a clandestine surveillance posture.
+        </p>
+    </div>
+
+    <!-- 3. Force Organisation, Escort Doctrine & Speed Discipline -->
+    <div style="background-color: #0e1626; border: 1px solid #1a273f; border-left: 3px solid #00d2ff; padding: 14px 16px; margin-bottom: 14px; border-radius: 0 4px 4px 0;">
+        <div style="color: #00d2ff; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+            3. FORCE ORGANISATION, ESCORT DOCTRINE &amp; SPEED DISCIPLINE
+        </div>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0 0 10px 0; color: #cbd5e1;">
+            Commander Task Force 317 must immediately assemble all deployed surface and subsurface units into structured operational groups:
+        </p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+            <li style="margin-bottom: 6px;">
+                <strong style="color: #00d2ff;">Speed Discipline &amp; Grouping:</strong> Carrier Strike Group must make its way towards the Area of Operations (AOO) at best possible speed whilst considering the trade-off between transit speed and fuel consumption. Slower auxiliary tankers, dry cargo, support, and amphibious ships need to be formed into separate formation(s) to prevent slowing capital ship manoeuvring.
+            </li>
+            <li style="margin-bottom: 6px;">
+                <strong style="color: #00d2ff;">Dedicated Escort Coverage:</strong> Unarmed civilian transports (STUFT cruise liners, Ro-Ros), amphibious landing ships, and logistics vessels must be protected through contested sea lanes. Form independent auxiliary convoys and assign dedicated surface escort and RAF presence along the convoy route.
+            </li>
+            <li style="margin-bottom: 6px;">
+                <strong style="color: #00d2ff;">Astute-Class SSNs:</strong> Fleet nuclear attack submarines are not bound by escort duties or fuel conservation. They can steam south at sustained high speeds to establish an advance screening and subsurface sea denial ahead of the main fleet, and begin building tactical situational awareness around the Falklands.
+            </li>
+            <li>
+                <strong style="color: #00d2ff;">Fuel Conservation &amp; Replenishment:</strong> Distance from the United Kingdom to Ascension Island and onward to the Falklands exceeds 7,000 nautical miles. Fuel conservation needs to be managed from the start for both ships and aircraft making the transit. Each fleet formation and each flight heading out should be supported by an adequate allocation of fleet tankers (RFA Tide/Wave class) and RAF Voyager refuelling assets.
+            </li>
+        </ul>
+    </div>
+
+    <!-- 4. Midway Point (Ascension Island) -->
+    <div style="background-color: #0e1626; border: 1px solid #1a273f; border-left: 3px solid #00d2ff; padding: 14px 16px; margin-bottom: 16px; border-radius: 0 4px 4px 0;">
+        <div style="color: #00d2ff; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
+            4. MIDWAY POINT (ASCENSION ISLAND)
+        </div>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0 0 8px 0; color: #cbd5e1;">
+            Excluding forward Falklands presence (HMS <em>Medway</em> and advance sprinting SSNs), all fleets and transiting aircraft must stop at <strong style="color: #ffffff;">Ascension Island (Wideawake Airfield / Anchorage)</strong> to refuel, load stores and troops, and reorganise for the final push towards the Falklands Theatre. Ascension is the last stop before the Area of Operations and the final opportunity to make ready for action.
+        </p>
+        <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #94a3b8;">
+            <strong style="color: #00d2ff;">OPERATIONAL NOTICE:</strong> Expect new orders and refined intelligence updates when the fleet assembles at Ascension Island.
+        </p>
+    </div>
+
+    <!-- Footer Sign-off -->
+    <div style="border-top: 1px solid #1a273f; padding-top: 10px; font-size: 11px; color: #64748b; text-align: center; letter-spacing: 1.5px; text-transform: uppercase;">
+        ADMIRALTY SIGNAL // PERMANENT JOINT HEADQUARTERS // GOD SAVE THE KING // OUT
+    </div>
+</div>
+</body>
+</html>]==]
+
+    template = template:gsub("{hoursDelayed}", tostring(hoursDelayed))
+    template = template:gsub("{daysDelayed}", tostring(daysDelayed))
+    template = template:gsub("{departureDTG}", tostring(departureDTG))
+    template = template:gsub("{totalPoints}", tostring(totalPoints))
+    template = template:gsub("{unitCount}", tostring(unitCount))
+    return template
+end
+
+-- =============================================================================
 -- UNIFIED ORDER EXECUTION ENGINE
 -- Handles validation, clock advancement, boons, KV storage, and force spawning
 -- =============================================================================
@@ -633,115 +1062,226 @@ function CTFS.ProcessOrder(selections)
     ScenEdit_SetKeyValue("CTFS_DEPARTURE_DATE", dateStr .. " " .. timeStr)
     ScenEdit_SetKeyValue("CTFS_TOTAL_UNITS", tostring(#verified.units))
 
-    -- 4. Sort Spawn Order: Ships & Submarines FIRST, Aircraft SECOND
-    local spawnOrder = {}
+    -- 4. Separate & Order Spawning Pipeline:
+    -- Surface Ships & Submarines FIRST (Flagship Queen Elizabeth #1, Standing Fleet, then Purchased Ships)
+    -- Fixed-Wing Aircraft & Staged Aviation SECOND
+    local shipOrder = {}
+    local airOrder = {}
+
     for _, item in ipairs(verified.units) do
         if item.type ~= "Aircraft" then
-            table.insert(spawnOrder, 1, item)
+            table.insert(shipOrder, item)
         else
-            table.insert(spawnOrder, item)
+            table.insert(airOrder, item)
         end
     end
 
-    -- 5. Force Spawning Pipeline
+    -- Ensure HMS Queen Elizabeth spawns first so carrier airwing and group lead are anchored
+    table.sort(shipOrder, function(a, b)
+        if a.name == "HMS Queen Elizabeth" then return true end
+        if b.name == "HMS Queen Elizabeth" then return false end
+        if a.isDefault and not b.isDefault then return true end
+        if not a.isDefault and b.isDefault then return false end
+        return false
+    end)
+
+    -- 5. Force Spawning Pipeline: Ships & Submarines
     local spawnedUnits = {}
-    for _, item in ipairs(spawnOrder) do
+    local allAirToSpawn = {}
+
+    for _, item in ipairs(shipOrder) do
         for i = 1, item.qty do
             local unitName = item.name
             if item.qty > 1 then unitName = unitName .. " #" .. i end
 
-            local newUnit = nil
-            if item.type == "Aircraft" then
-                -- Match Base GUID (carrier, amphibious host, or mainland airbase)
-                local baseGuid = spawnedUnits[item.spawnRP]
-                if not baseGuid then
-                    local existing = ScenEdit_GetUnit({ side = "UK", name = item.spawnRP })
-                    if existing then
-                        baseGuid = existing.guid
-                    elseif string.match(item.spawnRP, "^W8V2DT-") then
-                        baseGuid = item.spawnRP
-                    end
-                end
+            -- Standing Task Force baseline ships (except Falklands forward presence) spawn at FLEET_SPAWN1.
+            -- HMS Medway spawns at FLEET_FALKLANDS.
+            -- Purchased ships spawn at their designated authentic naval base RP (with graceful fallback).
+            local targetRP = (item.isDefault and item.name ~= "HMS Medway") and "FLEET_SPAWN1" or item.spawnRP
+            local lat, lon = ResolveSpawnCoords(targetRP, "FLEET_SPAWN1")
 
-                if baseGuid then
-                    newUnit = ScenEdit_AddUnit({
-                        type = "Aircraft",
-                        side = "UK",
-                        dbid = item.dbid,
-                        name = unitName,
-                        base = baseGuid,
-                        loadoutid = item.loadoutid or 0,
-                        TimeToReady_Minutes = 0
-                    })
-                else
-                    -- Fallback to Reference Point FLEET_SPAWN1
-                    local rp = ScenEdit_GetReferencePoint({ side = "UK", name = "FLEET_SPAWN1" })
-                    local lat = rp and rp.latitude or "-50.0000"
-                    local lon = rp and rp.longitude or "-50.0000"
-                    newUnit = ScenEdit_AddUnit({
-                        type = "Aircraft",
-                        side = "UK",
-                        dbid = item.dbid,
-                        name = unitName,
-                        latitude = lat,
-                        longitude = lon,
-                        loadoutid = item.loadoutid or 0,
-                        TimeToReady_Minutes = 0
-                    })
-                end
-            else
-                -- Ships and Submarines
-                local rp = ScenEdit_GetReferencePoint({ side = "UK", name = item.spawnRP })
-                local lat = rp and rp.latitude or "-50.0000"
-                local lon = rp and rp.longitude or "-50.0000"
-                newUnit = ScenEdit_AddUnit({
-                    type = item.type,
-                    side = "UK",
-                    dbid = item.dbid,
-                    name = unitName,
-                    latitude = lat,
-                    longitude = lon
-                })
-            end
+            local newUnit = ScenEdit_AddUnit({
+                type = item.type,
+                side = "UK",
+                dbid = item.dbid,
+                name = unitName,
+                latitude = lat,
+                longitude = lon
+            })
 
             if newUnit then
                 spawnedUnits[unitName] = newUnit.guid
                 spawnedUnits[item.name] = newUnit.guid
 
-                -- 6. Dynamic Magazine and VLS Refills
-                if verified.upgrades[item.name] then
-                    local percentToAdd = verified.upgrades[item.name] / 100
-                    local mags = newUnit.magazines
-                    if mags and type(mags) == "table" then
-                        for _, mag in ipairs(mags) do
-                            local capacity = tonumber(mag.mag_capacity or mag.capacity) or 0
-                            local weapons = mag.mag_weapons or mag.weapons
-                            if weapons and type(weapons) == "table" then
-                                for _, wpn in ipairs(weapons) do
-                                    local wpnDbid = tonumber(wpn.wpn_dbid)
-                                    local amountToAdd = math.floor(capacity * percentToAdd)
-                                    if wpnDbid and amountToAdd > 0 then
-                                        ScenEdit_AddWeaponToUnitMagazine({
-                                            guid = newUnit.guid,
-                                            mag_guid = mag.mag_GUID or mag.guid,
-                                            wpn_dbid = wpnDbid,
-                                            number = amountToAdd
-                                        })
-                                    end
-                                end
-                            end
-                        end
+                -- 5a. Form Baseline Fleet into "Standing Task Force" Group (excluding forward Falklands assets)
+                if item.isDefault and item.type == "Ship" and item.name ~= "HMS Medway" then
+                    pcall(function()
+                        ScenEdit_SetUnit({ guid = newUnit.guid, group = "Standing Task Force" })
+                    end)
+                end
+
+                -- 5b. Stage Authentic Embarked Aviation for Unified Spawning Pipeline
+                local embarkedList = CTFS.SHIP_AIRCRAFT[item.name]
+                if embarkedList and type(embarkedList) == "table" then
+                    for _, acDef in ipairs(embarkedList) do
+                        table.insert(allAirToSpawn, {
+                            hostName = item.name,
+                            targetGuid = newUnit.guid,
+                            spawnRP = item.name,
+                            dbid = acDef.dbid,
+                            shortName = acDef.shortName or acDef.name,
+                            squadron = acDef.squadron,
+                            loadoutid = acDef.loadoutid or 0,
+                            qty = acDef.qty or 1
+                        })
                     end
+                end
+
+                -- 5c. Configure Silos & Magazines (Enforce peacetime loadouts unless upgraded)
+                if item.name == "HMS Queen Elizabeth" then
+                    local qeSteps = verified.upgrades["HMS Queen Elizabeth"] or 0
+                    CTFS.ConfigureCarrierMagazines(newUnit, qeSteps)
+                elseif item.type == "Ship" and MODEL_MAP[item.name] and MODEL_MAP[item.name].upgradeCost then
+                    local hasVls = (verified.upgrades[item.name] == true)
+                    CTFS.ConfigureShipVLS(newUnit, hasVls)
                 end
             end
         end
     end
 
-    ScenEdit_MsgBox(
-        "Task Force Assembly Complete!\n\nAll selected units successfully deployed.\nDeparture Delayed: " ..
-        hoursDelayed ..
-        " Hours (" .. verified.totalPoints .. " Points spent).\nArgentine defensive preparations adjusted accordingly.",
-        1)
+    -- 6. Collect Staged Theater / Carrier Fixed-Wing Aviation & Naval Air Wing Additions
+    for _, item in ipairs(airOrder) do
+        local hostName = CTFS.AIRBASE_DISPLAY_NAMES[item.spawnRP] or item.spawnRP
+        table.insert(allAirToSpawn, {
+            hostName = hostName,
+            spawnRP = item.spawnRP,
+            dbid = item.dbid,
+            shortName = item.shortName or item.name,
+            squadron = item.squadron,
+            loadoutid = item.loadoutid or 0,
+            qty = item.qty
+        })
+    end
+
+    -- Pre-calculate group totals across all staged aviation (Host + Aircraft Type + Squadron)
+    -- This guarantees continuous and consistent #1..#N numbering across baseline and purchased additions
+    local groupTotals = {}
+    for _, entry in ipairs(allAirToSpawn) do
+        local key = entry.hostName .. "::" .. entry.shortName .. "::" .. (entry.squadron or "")
+        groupTotals[key] = (groupTotals[key] or 0) + entry.qty
+    end
+
+    local groupCounters = {}
+    for _, entry in ipairs(allAirToSpawn) do
+        local key = entry.hostName .. "::" .. entry.shortName .. "::" .. (entry.squadron or "")
+        local totalNum = groupTotals[key]
+
+        for aIdx = 1, entry.qty do
+            local curNum = (groupCounters[key] or 0) + 1
+            groupCounters[key] = curNum
+
+            local unitName = FormatAircraftName(entry.hostName, entry.shortName, entry.squadron, curNum, totalNum)
+
+            -- Match Base GUID (carrier, amphibious host, or mainland airbase)
+            local baseGuid = entry.targetGuid or spawnedUnits[entry.spawnRP]
+            if not baseGuid and entry.spawnRP then
+                local existing = ScenEdit_GetUnit({ side = "UK", name = entry.spawnRP })
+                if existing then
+                    baseGuid = existing.guid
+                elseif string.match(entry.spawnRP, "^W8V2DT-") then
+                    baseGuid = entry.spawnRP
+                end
+            end
+
+            local newUnit = nil
+            if baseGuid then
+                newUnit = ScenEdit_AddUnit({
+                    type = "Aircraft",
+                    side = "UK",
+                    dbid = entry.dbid,
+                    name = unitName,
+                    base = baseGuid,
+                    loadoutid = entry.loadoutid or 0,
+                    TimeToReady_Minutes = 0
+                })
+            else
+                -- Fallback coordinates if airbase/carrier not resolved
+                local lat, lon = ResolveSpawnCoords(entry.spawnRP, "FLEET_SPAWN1")
+                newUnit = ScenEdit_AddUnit({
+                    type = "Aircraft",
+                    side = "UK",
+                    dbid = entry.dbid,
+                    name = unitName,
+                    latitude = lat,
+                    longitude = lon,
+                    loadoutid = entry.loadoutid or 0,
+                    TimeToReady_Minutes = 0
+                })
+            end
+
+            if newUnit then
+                spawnedUnits[unitName] = newUnit.guid
+            end
+        end
+    end
+
+    local daysDelayed = string.format("%.1f", hoursDelayed / 24)
+    local departureDTG = (dateStr or "2027-12-26") .. " " .. (timeStr or "08:00:00") .. "Z"
+    local dispatchHTML = CTFS.GenerateLaunchDispatchHTML(hoursDelayed, daysDelayed, departureDTG, verified.totalPoints, #verified.units)
+
+    -- Detect dynamic player side
+    local playerSide = nil
+    pcall(function()
+        playerSide = ScenEdit_PlayerSide()
+    end)
+    if not playerSide or playerSide == "" then
+        playerSide = "UK"
+    end
+
+    -- 1. Deliver guaranteed modal popup dialog into player view
+    local modalShown = false
+    pcall(function()
+        if UI_CallAdvancedHTMLDialog then
+            UI_CallAdvancedHTMLDialog("ROYAL NAVY FLEET OPERATIONAL ORDER", dispatchHTML, { "Acknowledge Orders" })
+            modalShown = true
+        end
+    end)
+
+    -- 2. Deliver operational dispatch via ScenEdit_SpecialMessage (preserves OPORD in Message Log & plays radio chime)
+    local msgDelivered = false
+    pcall(function()
+        ScenEdit_SpecialMessage(playerSide, dispatchHTML)
+        msgDelivered = true
+    end)
+    if not msgDelivered then
+        pcall(function()
+            ScenEdit_SpecialMessage("UK", dispatchHTML)
+            msgDelivered = true
+        end)
+    end
+    if not msgDelivered then
+        pcall(function()
+            ScenEdit_SpecialMessage("playerside", dispatchHTML)
+            msgDelivered = true
+        end)
+    end
+
+    -- Emergency Fallback: Plain text modal if HTML message delivery failed
+    if not msgDelivered then
+        pcall(function()
+            ScenEdit_MsgBox(
+                "ROYAL NAVY FLEET OPERATIONAL ORDER // OP RECORPORATE\n\n" ..
+                "Task Force 317 Staging & Mobilisation Complete.\n" ..
+                "Departure Delayed: " .. daysDelayed .. " Days (" .. hoursDelayed .. " Hours)\n" ..
+                "Total Deployed Units: " .. #verified.units .. "\n\n" ..
+                "Primary Directives:\n" ..
+                "1. MIDWAY POINT: All fleets & flights (excl. forward Falklands assets) stage to Ascension Island to refuel, load stores & troops, and reorganise.\n" ..
+                "2. SPEED DISCIPLINE: Keep slow auxiliaries in separate convoys with dedicated escorts to maintain capital ship mobility.\n" ..
+                "3. FORWARD RECON & SEA DENIAL: Astute SSNs sprint south to establish screening cordon and subsurface sea denial ahead of main fleet.\n" ..
+                "4. FORWARD PRESENCE: HMS Medway maintains EMCON Alpha and low-profile surveillance from safe standoff.",
+                1)
+        end)
+    end
     return true
 end
 
@@ -1549,10 +2089,12 @@ CTFS.HTML_TEMPLATE = [==[
     <div class="launch-container">
         <button type="button" class="launch-btn" onclick="executeLaunch()">
             <span class="btn-main-title">LAUNCH OPERATION RECORPORATE</span>
-            <span class="btn-sub-title">Deploy task force to theater &bull; You can close this window after pressing
-                this</span>
+            <span class="btn-sub-title" id="btn-sub-title" style="display: none;">You can safely close this window</span>
         </button>
     </div>
+
+    <!-- Operational Orders Display (Full Widescreen View on Launch) -->
+    <div id="orders-display" style="display: none; padding: 10px 0 30px 0; max-width: 960px; margin: 0 auto;"></div>
 
     <script>
         const MAX_POINTS = 100;
@@ -1622,7 +2164,7 @@ CTFS.HTML_TEMPLATE = [==[
             // 2. Aircraft (Drones, Helicopters, Fixed-Wing) - Checked BEFORE Ships!
             if (type === 'Aircraft' || (!type && (role.includes('aircraft') || role.includes('helo') || role.includes('helicopter') || role.includes('drone') || role.includes('uav')))) {
                 // Drones / UAVs
-                if (role.includes('uav') || role.includes('drone') || name.includes('protector') || name.includes('scaneagle') || name.includes('peregrine') || name.includes('camcopter')) {
+                if (role.includes('uav') || role.includes('drone') || name.includes('protector') || name.includes('scaneagle') || name.includes('peregrine') || name.includes('camcopter') || name.includes('mojave') || name.includes('puma') || name.includes('malloy') || name.includes('proteus') || id.includes('mojave') || id.includes('puma') || id.includes('malloy') || id.includes('proteus')) {
                     return UNIT_SVGS.uav_drone;
                 }
                 // Helicopters
@@ -1669,7 +2211,7 @@ CTFS.HTML_TEMPLATE = [==[
             if (role.includes('destroyer') || role.includes('type 45') || name.includes('daring') || name.includes('defender') || name.includes('dragon') || name.includes('dauntless') || name.includes('diamond')) {
                 return UNIT_SVGS.destroyer;
             }
-            if (role.includes('frigate') || role.includes('type 23') || role.includes('type 26') || role.includes('type 31') || name.includes('albans') || name.includes('somerset') || name.includes('glasgow') || name.includes('venturer') || name.includes('kent') || name.includes('portland') || name.includes('sutherland')) {
+            if (role.includes('frigate') || role.includes('type 23') || role.includes('type 26') || role.includes('type 31') || role.includes('patrol') || role.includes('river') || name.includes('albans') || name.includes('somerset') || name.includes('glasgow') || name.includes('venturer') || name.includes('kent') || name.includes('portland') || name.includes('sutherland') || name.includes('medway')) {
                 return UNIT_SVGS.frigate;
             }
             if (role.includes('bay-class') || name.includes('bay') || role.includes('landing ship')) {
@@ -1721,10 +2263,11 @@ CTFS.HTML_TEMPLATE = [==[
                 items: [
                     // Default Carrier Strike Group & Auxiliaries (0 pts)
                     { id: "QE", type: "Ship", dbid: 1008, name: "HMS Queen Elizabeth", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Carrier Strike Group (CSG) Flagship", upgradeCost: 4 },
-                    { id: "StAlbans", type: "Ship", dbid: 3199, name: "HMS St Albans", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 23 ASW Frigate", upgradeCost: 1 },
-                    { id: "Daring", type: "Ship", dbid: 3200, name: "HMS Daring", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 45 Destroyer", upgradeCost: 1 },
-                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN3", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "Tideforce", type: "Ship", dbid: 2581, name: "RFA Tideforce", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN3", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Tide-class Replenishment Tanker" },
+                    { id: "StAlbans", type: "Ship", dbid: 3199, name: "HMS St Albans", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Daring", type: "Ship", dbid: 3200, name: "HMS Daring", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "Tideforce", type: "Ship", dbid: 2581, name: "RFA Tideforce", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
+                    { id: "Medway", type: "Ship", dbid: 2805, name: "HMS Medway", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_FALKLANDS", category: "default", group: "Falklands Forward Patrol Asset", role: "River-class Batch 2 OPV (Falklands Forward Patrol) — Embarked: 2x Peregrine UAV" },
 
                     // Default Carrier Airwing (0 pts)
                     { id: "F35B_def", type: "Aircraft", dbid: 1095, name: "F-35B Lightning II", isDefault: true, pts: 0, qty: 12, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Strike Fighter (1st Sq. - 12x Aircraft)", loadoutid: 25647 },
@@ -1732,7 +2275,7 @@ CTFS.HTML_TEMPLATE = [==[
                     { id: "Merlin_def", type: "Aircraft", dbid: 3336, name: "Merlin HM.2", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier ASW Helicopter (2x Aircraft)", loadoutid: 8559 },
                     { id: "Crowsnest_def", type: "Aircraft", dbid: 4110, name: "Merlin ASaC.5 Crowsnest", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier AEW Helicopter (2x Aircraft)", loadoutid: 8559 },
                     { id: "MerlinHC4_def", type: "Aircraft", dbid: 4273, name: "Merlin HC.4", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Transport Helicopter (2x Aircraft)", loadoutid: 21903 },
-                    { id: "Peregrine_def", type: "Aircraft", dbid: 6688, name: "Camcopter S-100 Peregrine", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Reconnaissance UAV (2x Drones)", loadoutid: 16923 },
+                    { id: "Mojave_def", type: "Aircraft", dbid: 5696, name: "Mojave UAV", isDefault: true, pts: 0, qty: 2, spawnRP: "HMS Queen Elizabeth", category: "default", group: "Carrier Air Wing (Embarkation)", role: "Carrier Strike/Recon UAV (2x Drones)", loadoutid: 30519 },
 
                     // Default RAF (0 pts)
                     { id: "Poseidon_def", type: "Aircraft", dbid: 4940, name: "P-8 Poseidon MRA.1", isDefault: true, pts: 0, qty: 2, spawnRP: "W8V2DT-0HNODCG173JA6", category: "default", group: "RAF Theater Air Support", role: "Maritime Patrol (RAF Lossiemouth - 2x Aircraft)", loadoutid: 27683 },
@@ -1742,19 +2285,22 @@ CTFS.HTML_TEMPLATE = [==[
                     { id: "Protector_def", type: "Aircraft", dbid: 4724, name: "Protector RG.1", isDefault: true, pts: 0, qty: 1, spawnRP: "W8V2DT-0HNODCG173JC2", category: "default", group: "RAF Theater Air Support", role: "Strategic UAV (RAF Marham - 1x Drone)", loadoutid: 13989 },
 
                     // Escorts & Auxiliaries
-                    { id: "Somerset", type: "Ship", dbid: 3199, name: "HMS Somerset", pts: 5, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Type 23 ASW Frigates", role: "Type 23 ASW Frigate", upgradeCost: 1 },
-                    { id: "Defender", type: "Ship", dbid: 3438, name: "HMS Defender", pts: 10, maxLimit: 1, spawnRP: "FLEET_SPAWN2", category: "escorts", group: "Type 45 Air Defense Destroyers", role: "Type 45 Destroyer (Sea Ceptor Upgrade)", upgradeCost: 1 },
-                    { id: "Glasgow", type: "Ship", dbid: 2795, name: "HMS Glasgow", pts: 7, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 26 Advanced ASW Frigate", upgradeCost: 1 },
-                    { id: "Anson", type: "Submarine", dbid: 725, name: "HMS Anson", pts: 5, maxLimit: 1, spawnRP: "FLEET_SPAWN4", category: "escorts", group: "Subsurface Fleet (Astute-Class SSN)", role: "Astute-Class Nuclear Submarine" },
+                    { id: "Somerset", type: "Ship", dbid: 3199, name: "HMS Somerset", pts: 5, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "escorts", group: "Type 23 ASW Frigates", role: "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Defender", type: "Ship", dbid: 3438, name: "HMS Defender", pts: 10, maxLimit: 1, spawnRP: "BASE_PORTSMOUTH", category: "escorts", group: "Type 45 Air Defense Destroyers", role: "Type 45 Destroyer (Sea Ceptor - 1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Venturer", type: "Ship", dbid: 3271, name: "HMS Venturer", pts: 3, maxLimit: 1, spawnRP: "BASE_ROSYTH", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 31 General Purpose Frigate (1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Glasgow", type: "Ship", dbid: 2795, name: "HMS Glasgow", pts: 7, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "escorts", group: "Next-Generation Frigates (Type 26 & Type 31)", role: "Type 26 Advanced ASW Frigate (1x Wildcat, 1x Proteus & 2x Peregrine)", upgradeCost: 2 },
+                    { id: "Anson", type: "Submarine", dbid: 725, name: "HMS Anson", pts: 5, maxLimit: 1, spawnRP: "BASE_CLYDE", category: "escorts", group: "Subsurface Fleet (Astute-Class SSN)", role: "Astute-Class Nuclear Submarine" },
 
-                    { id: "MountsBay", type: "Ship", dbid: 1451, name: "RFA Mounts Bay", pts: 3, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "CardiganBay", type: "Ship", dbid: 1451, name: "RFA Cardigan Bay", pts: 3, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores" },
-                    { id: "FortVictoria", type: "Ship", dbid: 406, name: "RFA Fort Victoria", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN3", category: "support", group: "Tide-Class & Fleet Replenishment (AOR)", role: "AOR Fleet Replenishment Vessel" },
-                    { id: "HurstPoint", type: "Ship", dbid: 2423, name: "MV Hurst Point", pts: 1, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "Point-Class Strategic Sealift (Ro-Ro)", role: "STUFT Strategic Ro-Ro Cargo" },
-                    { id: "Canberra", type: "Ship", dbid: 2024, name: "MV Canberra", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
-                    { id: "QueenVictoria", type: "Ship", dbid: 2024, name: "MV Queen Victoria", pts: 2, maxLimit: 1, spawnRP: "FLEET_SPAWN5", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+                    { id: "MountsBay", type: "Ship", dbid: 1451, name: "RFA Mounts Bay", pts: 3, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "CardiganBay", type: "Ship", dbid: 1451, name: "RFA Cardigan Bay", pts: 3, maxLimit: 1, spawnRP: "BASE_DEVONPORT", category: "support", group: "Bay-Class Amphibious Landing Ships", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "FortVictoria", type: "Ship", dbid: 406, name: "RFA Fort Victoria", pts: 2, maxLimit: 1, spawnRP: "BASE_PORTLAND", category: "support", group: "Tide-Class & Fleet Replenishment (AOR)", role: "AOR Fleet Replenishment (1x Merlin, 1x HC.4 & 1x Peregrine)" },
+                    { id: "HurstPoint", type: "Ship", dbid: 2423, name: "MV Hurst Point", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "Point-Class Strategic Sealift (Ro-Ro)", role: "STUFT Strategic Ro-Ro Cargo" },
+                    { id: "Canberra", type: "Ship", dbid: 2024, name: "MV Canberra", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
+                    { id: "QueenVictoria", type: "Ship", dbid: 2024, name: "MV Queen Victoria", pts: 1, maxLimit: 1, spawnRP: "BASE_MARCHWOOD", category: "support", group: "STUFT Transports & Commercial Charters", role: "Chartered Troop Transport — Cargo: 2,000 Troop Capacity" },
 
                     { id: "F35B_add", type: "Aircraft", dbid: 1095, name: "F-35B Lightning II", pts: 20, maxLimit: 1, spawnQty: 12, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Strike Fighter (2nd Squadron - 12x Aircraft)", loadoutid: 25647 },
+                    { id: "Mojave_add", type: "Aircraft", dbid: 5696, name: "Mojave UAV", pts: 1, maxLimit: 4, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Strike/Recon UAV", loadoutid: 30519 },
+                    { id: "Peregrine_add", type: "Aircraft", dbid: 6688, name: "Camcopter S-100 Peregrine", pts: 1, maxLimit: 1, spawnQty: 4, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier Recon UAV Flight (4x Drones)", loadoutid: 16924 },
                     { id: "Crowsnest_add", type: "Aircraft", dbid: 4110, name: "Merlin ASaC.5 Crowsnest", pts: 1, maxLimit: 2, spawnRP: "HMS Queen Elizabeth", category: "airwing", group: "Carrier Strike & Naval Air Wing", role: "Carrier AEW Helicopter", loadoutid: 8559 },
 
                     { id: "Wedgetail_add", type: "Aircraft", dbid: 4941, name: "E-7A Wedgetail AEW.1", pts: 4, maxLimit: 1, spawnRP: "W8V2DT-0HNODCG173J98", category: "raf", group: "Intelligence, Surveillance & Reconnaissance (ISR)", role: "AEW&C (Brize Norton)", loadoutid: 27687 },
@@ -1903,13 +2449,38 @@ CTFS.HTML_TEMPLATE = [==[
 
                 const upTitle = document.createElement('div');
                 upTitle.className = 'upgrades-header';
-                upTitle.innerText = `VLS / Magazine Fill (+${item.upgradeCost} pts / 25%)`;
-                upgradeBox.appendChild(upTitle);
 
                 const upRow = document.createElement('div');
                 upRow.className = 'upgrades-row';
 
-                for (let step = 1; step <= 3; step++) {
+                if (item.name === 'HMS Queen Elizabeth') {
+                    upTitle.innerText = `Aviation Magazine Fill (+${item.upgradeCost} pts / +25%)`;
+                    upgradeBox.appendChild(upTitle);
+
+                    const stepLabels = ['+25% (50% Fill)', '+50% (75% Fill)', '+75% (100% Fill)'];
+                    for (let step = 1; step <= 3; step++) {
+                        const label = document.createElement('label');
+                        label.className = 'upgrade-chip';
+
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.className = 'mag-upgrade';
+                        cb.setAttribute('data-target', item.name);
+                        cb.setAttribute('data-pts', item.upgradeCost.toString());
+                        cb.setAttribute('data-step-fill', '25');
+                        cb.onchange = calculateTotals;
+
+                        const txt = document.createElement('span');
+                        txt.innerText = stepLabels[step - 1];
+
+                        label.appendChild(cb);
+                        label.appendChild(txt);
+                        upRow.appendChild(label);
+                    }
+                } else {
+                    upTitle.innerText = `Missile Silo Fill (Default: Peacetime 25%)`;
+                    upgradeBox.appendChild(upTitle);
+
                     const label = document.createElement('label');
                     label.className = 'upgrade-chip';
 
@@ -1918,10 +2489,11 @@ CTFS.HTML_TEMPLATE = [==[
                     cb.className = 'mag-upgrade';
                     cb.setAttribute('data-target', item.name);
                     cb.setAttribute('data-pts', item.upgradeCost.toString());
+                    cb.setAttribute('data-fill', '100');
                     cb.onchange = calculateTotals;
 
                     const txt = document.createElement('span');
-                    txt.innerText = `+25%`;
+                    txt.innerText = `Full VLS Silos (+${item.upgradeCost} pts)`;
 
                     label.appendChild(cb);
                     label.appendChild(txt);
@@ -2136,8 +2708,13 @@ CTFS.HTML_TEMPLATE = [==[
 
             document.querySelectorAll('.mag-upgrade:checked').forEach(cb => {
                 const target = cb.getAttribute('data-target');
-                if (!payload.upgrades[target]) payload.upgrades[target] = 0;
-                payload.upgrades[target] += 25;
+                const stepFill = cb.getAttribute('data-step-fill');
+                if (stepFill) {
+                    payload.upgrades[target] = (payload.upgrades[target] || 0) + parseInt(stepFill);
+                } else {
+                    const fill = parseInt(cb.getAttribute('data-fill')) || 100;
+                    payload.upgrades[target] = fill;
+                }
                 payload.totalPoints += parseInt(cb.getAttribute('data-pts')) || 0;
             });
 
@@ -2154,14 +2731,156 @@ CTFS.HTML_TEMPLATE = [==[
             document.getElementById('ctfs_points').value = payload.totalPoints.toString();
             document.getElementById('ctfs_hours').value = (payload.totalPoints * HOURS_PER_POINT).toString();
 
-            const launchBtn = document.querySelector('.launch-btn');
-            if (launchBtn) {
-                launchBtn.disabled = true;
-                launchBtn.classList.add('launched');
-                const mainTitle = launchBtn.querySelector('.btn-main-title');
-                const subTitle = launchBtn.querySelector('.btn-sub-title');
-                if (mainTitle) mainTitle.textContent = '✓ ORDERS TRANSMITTED — TASK FORCE DEPLOYED';
-                if (subTitle) subTitle.textContent = 'Forces deployed & scenario clock advanced. You can now close this window.';
+            // Calculate operational timing for Admiralty Orders
+            const hoursDelayed = payload.totalPoints * HOURS_PER_POINT;
+            const daysDelayed = (hoursDelayed / 24).toFixed(1);
+            const depDate = new Date(BASE_DATE.getTime() + hoursDelayed * 3600 * 1000);
+            const dd = String(depDate.getUTCDate()).padStart(2, '0');
+            const mm = String(depDate.getUTCMonth() + 1).padStart(2, '0');
+            const yyyy = depDate.getUTCFullYear();
+            const hh = String(depDate.getUTCHours()).padStart(2, '0');
+            const min = String(depDate.getUTCMinutes()).padStart(2, '0');
+            const sec = String(depDate.getUTCSeconds()).padStart(2, '0');
+            const departureDTG = `${dd}.${mm}.${yyyy} ${hh}:${min}:${sec}Z`;
+
+            // Hide force selection interface elements
+            const hud = document.querySelector('.hud-dashboard');
+            const tabsHeader = document.getElementById('tabs-header');
+            const tabsContainer = document.getElementById('tabs-container');
+            const launchContainer = document.querySelector('.launch-container');
+
+            if (tabsHeader) tabsHeader.style.display = 'none';
+            if (tabsContainer) tabsContainer.style.display = 'none';
+            if (launchContainer) launchContainer.style.display = 'none';
+
+            if (hud) {
+                const stats = hud.querySelector('.stats-grid');
+                const timeline = hud.querySelector('.timeline-container');
+                const threatTitle = document.getElementById('threat-feed-title');
+                const threatPills = hud.querySelector('.threat-pills');
+                if (stats) stats.style.display = 'none';
+                if (timeline) timeline.style.display = 'none';
+                if (threatTitle) threatTitle.style.display = 'none';
+                if (threatPills) threatPills.style.display = 'none';
+            }
+
+            // Render Full Widescreen Admiralty Operational Orders directly in large window
+            const ordersDisplay = document.getElementById('orders-display');
+            if (ordersDisplay) {
+                ordersDisplay.innerHTML = `
+                    <div style="background-color: #0d1322; color: #cbd5e1; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Tahoma, Geneva, Verdana, sans-serif; padding: 24px 28px; border-radius: 8px; border: 1px solid #1c273e; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);">
+                        
+                        <!-- Header Banner -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border-bottom: 2px solid #00d2ff; padding-bottom: 14px;">
+                            <tr>
+                                <td style="vertical-align: top;">
+                                    <div style="color: #00d2ff; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">MINISTRY OF DEFENCE &bull; PERMANENT JOINT HEADQUARTERS (PJHQ) NORTHWOOD</div>
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: 1.5px; margin-top: 5px;">ROYAL NAVY FLEET OPERATIONAL ORDER // OP RECORPORATE</div>
+                                </td>
+                                <td style="vertical-align: top; text-align: right;">
+                                    <span style="background-color: rgba(200, 16, 46, 0.2); border: 1px solid #c8102e; color: #ff6b81; font-family: monospace; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 4px; letter-spacing: 1.5px; display: inline-block;">
+                                        TOP SECRET // COMMANDER EYES ONLY
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Telemetry Strip -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; background-color: #070a12; border: 1px solid #1c273e; border-radius: 6px;">
+                            <tr>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">ORIGINATOR:</strong> CINCFLEET / NORTHWOOD
+                                </td>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">ACTION TO:</strong> CTF 317 (FLAGSHIP HMS QUEEN ELIZABETH)
+                                </td>
+                                <td style="padding: 10px 14px; border-right: 1px solid #1c273e; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">DEPARTURE DTG:</strong> <span style="color: #ffffff; font-weight: bold;">${departureDTG}</span>
+                                </td>
+                                <td style="padding: 10px 14px; font-size: 12px; color: #8899b0;">
+                                    <strong style="color: #00d2ff;">STAGING DELAY:</strong> <span style="color: #ffffff; font-weight: bold;">${daysDelayed} DAYS (${hoursDelayed} HRS)</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- 1. Situation & Mobilisation Report -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                1. SITUATION &amp; MOBILISATION REPORT
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Following an operational staging and mobilisation period (${daysDelayed} Days elapsed), Task Force 317 is formally released from home waters and cleared to commence theatre transit for the South Atlantic Joint Operations Area (JOA).
+                            </p>
+                            <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #94a3b8;">
+                                <strong style="color: #00d2ff;">INTELLIGENCE ASSESSMENT:</strong> The operational delay required to marshal surface combatants, carrier strike squadrons, and sealift tonnage in UK ports has afforded Argentine Joint Forces crucial strategic breathing room to entrench and reinforce.
+                            </p>
+                        </div>
+
+                        <!-- 2. Theatre Forward Presence -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                2. THEATRE FORWARD PRESENCE
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0; color: #cbd5e1;">
+                                The River-class Offshore Patrol Vessel <strong style="color: #ffffff;">HMS Medway</strong> is currently forward-deployed in the Falklands sector. Being lightly armed and isolated, <em>Medway</em> has adopted strict emissions control (<strong style="color: #ffffff;">EMCON Alpha</strong>) and a clandestine surveillance posture.
+                            </p>
+                        </div>
+
+                        <!-- 3. Force Organisation, Escort Doctrine & Speed Discipline -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px;">
+                                3. FORCE ORGANISATION, ESCORT DOCTRINE &amp; SPEED DISCIPLINE
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Commander Task Force 317 must immediately assemble all deployed surface and subsurface units into structured operational groups:
+                            </p>
+                            <ul style="margin: 0; padding-left: 22px; font-size: 13.5px; line-height: 1.65; color: #cbd5e1;">
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Speed Discipline &amp; Grouping:</strong> Carrier Strike Group must make its way towards the Area of Operations (AOO) at best possible speed whilst considering the trade-off between transit speed and fuel consumption. Slower auxiliary tankers, dry cargo, support, and amphibious ships need to be formed into separate formation(s) to prevent slowing capital ship manoeuvring.
+                                </li>
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Dedicated Escort Coverage:</strong> Unarmed civilian transports (STUFT cruise liners, Ro-Ros), amphibious landing ships, and logistics vessels must be protected through contested sea lanes. Form independent auxiliary convoys and assign dedicated surface escort and RAF presence along the convoy route.
+                                </li>
+                                <li style="margin-bottom: 8px;">
+                                    <strong style="color: #00d2ff;">Astute-Class SSNs:</strong> Fleet nuclear attack submarines are not bound by escort duties or fuel conservation. They can steam south at sustained high speeds to establish an advance screening and subsurface sea denial ahead of the main fleet, and begin building tactical situational awareness around the Falklands.
+                                </li>
+                                <li>
+                                    <strong style="color: #00d2ff;">Fuel Conservation &amp; Replenishment:</strong> Distance from the United Kingdom to Ascension Island and onward to the Falklands exceeds 7,000 nautical miles. Fuel conservation needs to be managed from the start for both ships and aircraft making the transit. Each fleet formation and each flight heading out should be supported by an adequate allocation of fleet tankers (RFA Tide/Wave class) and RAF Voyager refuelling assets.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 4. Midway Point (Ascension Island) -->
+                        <div style="background-color: #070a12; border: 1px solid #1c273e; border-left: 4px solid #00d2ff; padding: 16px 18px; margin-bottom: 18px; border-radius: 0 6px 6px 0;">
+                            <div style="color: #00d2ff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">
+                                4. MIDWAY POINT (ASCENSION ISLAND)
+                            </div>
+                            <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 10px 0; color: #cbd5e1;">
+                                Excluding forward Falklands presence (HMS <em>Medway</em> and advance sprinting SSNs), all fleets and transiting aircraft must stop at <strong style="color: #ffffff;">Ascension Island (Wideawake Airfield / Anchorage)</strong> to refuel, load stores and troops, and reorganise for the final push towards the Falklands Theatre. Ascension is the last stop before the Area of Operations and the final opportunity to make ready for action.
+                            </p>
+                            <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #94a3b8;">
+                                <strong style="color: #00d2ff;">OPERATIONAL NOTICE:</strong> Expect new orders and refined intelligence updates when the fleet assembles at Ascension Island.
+                            </p>
+                        </div>
+
+                        <!-- Confirmation Banner -->
+                        <div style="background: linear-gradient(180deg, #1b5e20 0%, #0d3813 100%); border: 1px solid #00e676; border-radius: 6px; padding: 16px 20px; text-align: center; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0, 230, 118, 0.25);">
+                            <div style="color: #ffffff; font-size: 15px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">
+                                ORDERS TRANSMITTED - TASK FORCE DEPLOYED
+                            </div>
+                            <div style="color: #a7f3d0; font-size: 12px; margin-top: 4px; font-weight: 600;">
+                                You can safely close this window
+                            </div>
+                        </div>
+
+                        <!-- Footer Sign-off -->
+                        <div style="border-top: 1px solid #1c273e; padding-top: 12px; font-size: 11px; color: #64748b; text-align: center; letter-spacing: 1.5px; text-transform: uppercase;">
+                            ADMIRALTY SIGNAL // PERMANENT JOINT HEADQUARTERS // GOD SAVE THE KING // OUT
+                        </div>
+                    </div>
+                `;
+                ordersDisplay.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             // BRIDGE 2: Asynchronous WebView2 IPC (defend-luzon reference pattern)
@@ -2169,11 +2888,6 @@ CTFS.HTML_TEMPLATE = [==[
                 window.chrome.webview.postMessage("DIALOG_OK" + "CTFS_ProcessUIResponse('" + encodedPayload + "')");
             } else {
                 console.log("BRIDGE 2 POSTMESSAGE DISPATCH:", "DIALOG_OK" + "CTFS_ProcessUIResponse('" + encodedPayload + "')");
-                alert("TASK FORCE LAUNCHED (PREVIEW MODE)\n\n" +
-                    "Points Spent: " + payload.totalPoints + " / 100\n" +
-                    "Operation Start Delay: " + (payload.totalPoints * HOURS_PER_POINT / 24).toFixed(1) + " Days\n" +
-                    "Total Units Selected: " + payload.units.length + "\n\n" +
-                    "In-game CMO execution will advance the scenario clock, spawn forces, and apply Argentine escalation boons.");
             }
         }
 
