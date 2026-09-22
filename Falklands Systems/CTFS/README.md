@@ -95,28 +95,68 @@ The engine routes air assets directly to physical installations using exact GUID
 
 ---
 
-## 4. CMO Event Engine Integration & Wiring Table
+## 4. CMO Event Engine Integration & Execution Options
 
-Configure the following triggers, actions, and UI bindings in the CMO Event Editor:
+The CTFS supports both standard CMO WebView IPC architectures:
 
-| Script / Component | Location | Event Trigger Type | Condition / Action | Target Side |
-| :--- | :--- | :--- | :--- | :--- |
-| **Scenario Init** | `CTFS/core.lua` | Time Trigger | `00:00:01` (Scenario Start) | `UK` |
-| **UI Dialog Menu** | `CTFS/ctfs_ui.html`| Special Action | Player Triggered (Menu) | `UK` |
-| **UI Callback Listener**| `CTFS/core.lua` | WebView Message | Listens for `CTFS_ProcessUIResponse` | `UK` / `Argentina` |
+### Option A: Bridge 1 — Synchronous Modal Dialog (`CTFS.OpenDialog()`) [RECOMMENDED]
+Pauses the simulation clock completely while the player configures forces. Optimal for scenario start (pre-game setup).
+* **Trigger:** Time Trigger at `00:00:01` (Scenario Start).
+* **Action (Lua Script):**
+```lua
+local candidates = {
+    "Development\\Global\\Falklands Systems\\CTFS\\core.lua",
+    "Global\\Falklands Systems\\CTFS\\core.lua",
+    "Falklands Systems\\CTFS\\core.lua",
+    "CTFS\\core.lua"
+}
+local loaded = false
+for _, path in ipairs(candidates) do
+    if ScenEdit_RunScript(path) then
+        loaded = true
+        break
+    end
+end
+-- Fallback for distributed scenarios using CMO Scenario Attachments
+if not loaded and ScenEdit_UseAttachment then
+    loaded = pcall(ScenEdit_UseAttachment, "CTFS_core.lua") or pcall(ScenEdit_UseAttachment, "core.lua")
+end
 
-### Registering the CTFS Special Action
-To allow the player to open the Task Force Selector window from the CMO top menu at scenario launch, execute this command once in the Scenario Editor Lua Console:
+if CTFS and CTFS.OpenDialog then
+    CTFS.OpenDialog()
+else
+    ScenEdit_MsgBox("CTFS Error: Could not load core.lua via ScenEdit_RunScript or Scenario Attachment.", 1)
+end
+```
+* **Mechanism:** CMO invokes `UI_CallAdvancedHTMLDialog`, freezes the game clock, scrapes `<input type="hidden" name="ctfs_payload">` when the player clicks "Launch Task Force", sanitizes inputs, verifies the math server-side, advances the clock, triggers Argentine boons, and spawns all assets.
 
+### Option B: Bridge 2 — Asynchronous Dashboard (`CTFS.OpenUI()`)
+Runs as a non-modal message window without pausing the game clock. Optimal if invoked mid-game or as a Special Action.
+* **Special Action Registration:**
 ```lua
 ScenEdit_SetSpecialAction({
     ActionName = "CTFS_OpenSelector",
     text = "CTFS: Assemble Task Force",
-    location = "Falklands Systems\\CTFS\\ctfs_ui.html",
+    ScriptText = [[
+        if ScenEdit_RunScript("Development\\Global\\Falklands Systems\\CTFS\\core.lua") or (ScenEdit_UseAttachment and pcall(ScenEdit_UseAttachment, "core.lua")) then
+            if CTFS and CTFS.OpenUI then CTFS.OpenUI() end
+        end
+    ]],
     isRepeatable = false,
     isContainer = false
 })
 ```
+* **Mechanism:** CMO renders via `ScenEdit_SpecialMessage`. The in-page "LAUNCH TASK FORCE" button fires `window.chrome.webview.postMessage("DIALOG_OKCTFS_ProcessUIResponse('...')")`, invoking the global Lua callback `CTFS_ProcessUIResponse`.
+
+### Scenario Key-Value Store Variables
+Upon launch, CTFS writes persistent telemetry to CMO's global Key-Value store (`ScenEdit_SetKeyValue`):
+* `CTFS_COMPLETED`: `"true"`
+* `CTFS_POINTS_SPENT`: Total validated points spent (e.g. `"35"`)
+* `CTFS_HOURS_DELAYED`: Total hours delayed (e.g. `"175"`)
+* `CTFS_DEPARTURE_DATE`: Formatted Zulu departure timestamp
+* `CTFS_TOTAL_UNITS`: Total count of spawned unit records
+Other scenario scripts (e.g. Ground Control Engine / GCE) can query these values using `ScenEdit_GetKeyValue("CTFS_POINTS_SPENT")`.
+
 
 ---
 

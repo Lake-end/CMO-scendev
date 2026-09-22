@@ -34,6 +34,7 @@
 * Point-class #2423 
 * MoD Tankers (MV Leander Fisher,  	MV Fure Vanguard) #144
 * Wave-class #1406
+* STUFT Commercial Cruise Liner (45000GT) #2024 
 
 ## 3. SAMs
 * RBS 70 NG MANPADS #3913
