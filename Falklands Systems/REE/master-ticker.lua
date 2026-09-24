@@ -1,6 +1,7 @@
+---@diagnostic disable: undefined-global
 -- ==============================================================================
 -- FALKLANDS 2027: RANDOM EVENT ENGINE (REE)
--- SCRIPT 2: MASTER TICKER & EVENT EXECUTION ENGINE v5
+-- SCRIPT 2: MASTER TICKER & EVENT EXECUTION ENGINE v8
 -- ==============================================================================
 -- PURPOSE:
 -- Dynamic, zero-dependency, month-long random event engine for the Falklands 2027
@@ -22,6 +23,11 @@ local function REE_RunMasterTicker()
     local devVal = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
     local isDevMode = (devVal ~= "false" and devVal ~= "0" and devVal ~= "FALSE")
 
+    -- Developer Mode: Hourly execution is active by default when FALKL_DEV_MODE is true.
+    -- To disable hourly runs while keeping Dev Mode active, set 'REE_DEV_HOURLY_OFF'='true'.
+    local devHourlyOff = (ScenEdit_GetKeyValue("REE_DEV_HOURLY_OFF") == "true")
+    local devForceHourly = (isDevMode and not devHourlyOff) or (ScenEdit_GetKeyValue("REE_DEV_FORCE_EVENT_HOURLY") == "true")
+
     local CONFIG = {
         SCENARIO_MAX_DAYS    = tonumber(ScenEdit_GetKeyValue("REE_CONFIG_MAX_DAYS")) or 30,
         SLOT1_PROBABILITY    = 0.50, -- 50% chance for Slot 1 (00:00 - 12:00)
@@ -30,7 +36,7 @@ local function REE_RunMasterTicker()
         OPPOSING_SIDE        = "Argentina",
         NEUTRAL_SIDE         = "Neutral",
         DEV_MODE             = isDevMode,
-        DEV_FORCE_HOURLY     = (ScenEdit_GetKeyValue("REE_DEV_FORCE_EVENT_HOURLY") == "true"),
+        DEV_FORCE_HOURLY     = devForceHourly,
         DEV_FORCE_SEQUENTIAL = (ScenEdit_GetKeyValue("REE_DEV_FORCE_SEQUENTIAL") == "true"),
         MEDIA                = {
             ATTACHMENTS_REL_PATH        = "Attachments\\",
@@ -44,12 +50,15 @@ local function REE_RunMasterTicker()
     }
 
     -- Load pre-packaged web-optimized media assets (base64 image tables) if present
+    local REE_MEDIA_DATA = _G["REE_MEDIA_DATA"]
     if REE_MEDIA_DATA == nil then
         pcall(function()
             ScenEdit_RunScript("Development\\Global\\Falklands Systems\\REE\\ree-media-data.lua")
         end)
+        REE_MEDIA_DATA = _G["REE_MEDIA_DATA"]
         if REE_MEDIA_DATA == nil and ScenEdit_UseAttachment then
             pcall(ScenEdit_UseAttachment, "ree-media-data.lua")
+            REE_MEDIA_DATA = _G["REE_MEDIA_DATA"]
         end
     end
 
@@ -139,6 +148,9 @@ local function REE_RunMasterTicker()
                     mediaHtml = string.format([[
         <div class="media-card">
             <iframe src="%s" title="Video Intercept" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div style="text-align: center; padding: 8px 12px; background: #161b22; border-top: 1px solid #21262d; font-size: 13px; color: #58a6ff;">
+                <strong>Click play to watch the video</strong>
+            </div>
             <div class="media-caption">
                 <span>%s</span>
                 <span class="media-badge">VIDEO INTERCEPT</span>
@@ -148,6 +160,9 @@ local function REE_RunMasterTicker()
                     mediaHtml = string.format([[
         <div class="media-card">
             <iframe src="%s" title="Video Intercept" allow="autoplay" allowfullscreen></iframe>
+            <div style="text-align: center; padding: 8px 12px; background: #161b22; border-top: 1px solid #21262d; font-size: 13px; color: #58a6ff;">
+                <strong>Click play to watch the video</strong>
+            </div>
             <div class="media-caption">
                 <span>%s</span>
                 <span class="media-badge">VIDEO INTERCEPT</span>
@@ -160,6 +175,9 @@ local function REE_RunMasterTicker()
                 <div class="video-fallback-title">&#9658; CLASSIFIED VIDEO INTERCEPT: %s</div>
                 <div class="video-fallback-desc">Tactical Video Recording (1080p H.264) | South Atlantic Electronic Intercept</div>
                 <div style="font-size: 11px; color: #58a6ff; font-family: monospace;">Packaged in: &lt;scenario-folder&gt;\Attachments\%s</div>
+            </div>
+            <div style="text-align: center; padding: 8px 12px; background: #161b22; border-top: 1px solid #21262d; font-size: 13px; color: #58a6ff;">
+                <strong>Click play to watch the video</strong>
             </div>
             <div class="media-caption">
                 <span>%s</span>
@@ -192,43 +210,15 @@ local function REE_RunMasterTicker()
         }
         .container {
             width: 100%%;
-            max-width: 850px;
+            max-width: 820px;
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
         }
-        .header {
-            background: linear-gradient(135deg, #1f242c 0%%, #161b22 100%%);
-            padding: 16px 20px;
-            border-bottom: 2px solid #58a6ff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .badge {
-            background: #1f6feb;
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 4px 10px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-        }
-        .badge-intel { background: #8957e5; }
-        .badge-warning { background: #d29922; color: #0d1117; }
-        .badge-danger { background: #f85149; }
-        .badge-psyop { background: #da3633; }
-        .title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #f0f6fc;
-            margin-top: 6px;
-        }
         .content {
-            padding: 20px;
+            padding: 24px;
             font-size: 14px;
             line-height: 1.6;
             color: #e6edf3;
@@ -249,7 +239,7 @@ local function REE_RunMasterTicker()
             background: #221213;
         }
         .media-card {
-            margin: 14px 0 8px 0;
+            margin: 16px 0 8px 0;
             background: #0d1117;
             border: 1px solid #30363d;
             border-radius: 6px;
@@ -303,35 +293,16 @@ local function REE_RunMasterTicker()
             color: #8b949e;
             margin-bottom: 8px;
         }
-        .footer {
-            background: #0d1117;
-            padding: 12px 20px;
-            border-top: 1px solid #21262d;
-            font-size: 12px;
-            color: #8b949e;
-            display: flex;
-            justify-content: space-between;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div>
-                <span class="badge %s">%s</span>
-                <div class="title">%s</div>
-            </div>
-        </div>
         <div class="content">
             %s
         </div>
-        <div class="footer">
-            <span>Falklands Theatre Strategic Operations</span>
-            <span>Scenario Hour: %s</span>
-        </div>
     </div>
 </body>
-</html>]], title, badgeClass, categoryBadge, title, finalBody, hourStr or tostring(currentHour))
+</html>]], title, finalBody)
     end
 
     local function ShowModalDialog(categoryBadge, title, contentHtml, btnLabel, mediaConfig)
@@ -346,9 +317,9 @@ local function REE_RunMasterTicker()
     -- ==========================================================================
     -- 2.1 DYNAMIC RELATIVE TASK EVENT GENERATOR
     -- ==========================================================================
-    -- Dynamically binds 4 Reference Points relative to a target unit, creates a
-    -- UnitEntersArea trigger for side UK, and registers a LuaScript action that
-    -- cleans up RPs/events, updates target unit state, and displays completion modal.
+    -- Dynamically creates 4 Reference Points (relative to a friendly unit or static search box),
+    -- registers a UnitEntersArea trigger for side UK, and executes dynamic resolution when
+    -- another friendly unit enters the zone (guarding against self-triggering).
     local function CreateDynamicRelativeTask(params)
         local evtName = string.format("REE_Task_%s_%d", params.taskType, currentHour)
         local trigName = string.format("REE_Trig_%s_%d", params.taskType, currentHour)
@@ -364,19 +335,43 @@ local function REE_RunMasterTicker()
         local bearings = { 45, 135, 225, 315 }
         local distNM = params.distanceNM or 0.5
 
-        for i = 1, 4 do
-            pcall(function()
-                ScenEdit_AddReferencePoint({
-                    side = CONFIG.PLAYER_SIDE,
-                    name = rpNames[i],
-                    relativeTo = params.targetGuid,
-                    bearing = bearings[i],
-                    distance = distNM,
-                    bearingType = 0,
-                    bearingtype = 0,
-                    highlighted = false
-                })
-            end)
+        if params.centerLat and params.centerLon then
+            -- Create 4 static geographic reference points forming a visible search box
+            local dLat = (distNM / 60)
+            local dLon = (distNM / (60 * math.cos(math.rad(params.centerLat))))
+            local rpCoords = {
+                { lat = params.centerLat + dLat, lon = params.centerLon - dLon },
+                { lat = params.centerLat + dLat, lon = params.centerLon + dLon },
+                { lat = params.centerLat - dLat, lon = params.centerLon + dLon },
+                { lat = params.centerLat - dLat, lon = params.centerLon - dLon }
+            }
+            for i = 1, 4 do
+                pcall(function()
+                    ScenEdit_AddReferencePoint({
+                        side = CONFIG.PLAYER_SIDE,
+                        name = rpNames[i],
+                        latitude = rpCoords[i].lat,
+                        longitude = rpCoords[i].lon,
+                        highlighted = true
+                    })
+                end)
+            end
+        else
+            -- Create relative reference points anchored to friendly unit
+            for i = 1, 4 do
+                pcall(function()
+                    ScenEdit_AddReferencePoint({
+                        side = CONFIG.PLAYER_SIDE,
+                        name = rpNames[i],
+                        relativeTo = params.targetGuid,
+                        bearing = bearings[i],
+                        distance = distNM,
+                        bearingType = 0,
+                        bearingtype = 0,
+                        highlighted = true
+                    })
+                end)
+            end
         end
 
         local quotedRps = {}
@@ -388,8 +383,32 @@ local function REE_RunMasterTicker()
         local completionModalHtml = BuildModalHtml(params.badge or "FLEET", params.title, params.completionHtml,
             tostring(currentHour))
 
+        local trigCreatedTime = 0
+        pcall(function() trigCreatedTime = tonumber(ScenEdit_CurrentTime()) or 0 end)
+
         local actionScriptCode = string.format([[
 -- REE Dynamic Task Execution Script
+local uX = ScenEdit_UnitX()
+if not uX then return end
+
+local targetGuid = %q
+local uGuid = tostring(uX.guid or ""):lower()
+local tGuid = tostring(targetGuid or ""):lower()
+
+if tGuid ~= "" and (uGuid == tGuid or (uX.group and tostring(uX.group.guid or ""):lower() == tGuid)) then
+    -- Distressed/target unit itself is within its own area; ignore and wait for rescue/support unit
+    return
+end
+
+-- Minimum elapsed time guard for surface ships:
+-- Prevents ships that were already sailing adjacent in formation from instantly resolving the task.
+-- Helicopters/aircraft dispatched to the datum can resolve at any time.
+local createdTime = %d
+local now = tonumber(ScenEdit_CurrentTime()) or 0
+if uX.type == "Ship" and createdTime > 0 and (now - createdTime) < 600 then
+    return
+end
+
 local rps = %s
 for _, rpName in ipairs(rps) do
     pcall(function() ScenEdit_DeleteReferencePoint({ side = %q, name = rpName }) end)
@@ -404,7 +423,7 @@ pcall(function()
     local dlgHtml = %q
     UI_CallAdvancedHTMLDialog(%q, dlgHtml, { "Acknowledge" })
 end)
-]], rpsArrayCode, CONFIG.PLAYER_SIDE, evtName, trigName, trigName, actName, actName, params.extraActionLua or "",
+]], params.targetGuid or "", trigCreatedTime, rpsArrayCode, CONFIG.PLAYER_SIDE, evtName, trigName, trigName, actName, actName, params.extraActionLua or "",
             completionModalHtml, params.title)
 
         local tgFilter = {
@@ -442,7 +461,7 @@ end)
             ScenEdit_SetEvent(evtName, {
                 mode = "add",
                 description = evtName,
-                isRepeatable = false,
+                isRepeatable = true,
                 isActive = true,
                 isShown = false
             })
@@ -450,8 +469,13 @@ end)
             ScenEdit_SetEventAction(evtName, { mode = "add", name = actName, description = actName })
         end)
 
-        LogREE(string.format("DYNAMIC EVENT CREATED: [%s] relative to unit %s (boundary: %.2f NM)", evtName,
-            params.targetGuid, distNM))
+        if params.centerLat and params.centerLon then
+            LogREE(string.format("DYNAMIC EVENT CREATED: [%s] static search box at (%.2f, %.2f) (radius: %.2f NM)", evtName,
+                params.centerLat, params.centerLon, distNM))
+        else
+            LogREE(string.format("DYNAMIC EVENT CREATED: [%s] relative to unit %s (boundary: %.2f NM)", evtName,
+                tostring(params.targetGuid), distNM))
+        end
     end
 
     -- ==========================================================================
@@ -590,17 +614,24 @@ end)
     -- ==========================================================================
     -- 6. DEFERRED / ONGOING TIMERS HANDLER
     -- ==========================================================================
-    -- 6.1 Cargo Storm Speed Restriction
+    -- 6.1 Cargo Storm Speed Restriction & Engine Casualty
     local stormEndHour = tonumber(ScenEdit_GetKeyValue("REE_Timer_StormEndHour")) or -1
     if stormEndHour > 0 and currentHour >= stormEndHour then
         local shipGuid = ScenEdit_GetKeyValue("REE_Timer_StormShipGUID")
+        local compGuid = ScenEdit_GetKeyValue("REE_Timer_StormCompGUID")
         if shipGuid and shipGuid ~= "" then
+            if compGuid and compGuid ~= "" and compGuid ~= "engine" then
+                ScenEdit_SetUnitDamage({ guid = shipGuid, dp = 0, components = { { compGuid, 'none' } } })
+            else
+                ScenEdit_SetUnitDamage({ guid = shipGuid, dp = 0, components = { { 'type', type = 'engine', 0 } } })
+            end
             ScenEdit_SetUnit({ guid = shipGuid, manualSpeed = "Off" })
-            LogREE("ONGOING RESOLVED: Cargo restowing complete on vessel " .. shipGuid .. ". Full speed restored.")
+            LogREE("ONGOING RESOLVED: Cargo restowing complete and engine casualties cleared on vessel " .. shipGuid .. ". Full speed restored.")
             ShowModalDialog("FLEET", "Cargo Restowing Completed",
-                "<p>Deck crews report all cargo lashings have been reinforced and container locks secured following recent Atlantic heavy seas. Standard cruising speeds are resumed across the formation.</p>",
+                "<p>Deck crews report all cargo lashings have been reinforced and container locks secured following recent Atlantic heavy seas. Engine plant is cleared for normal operations and standard cruising speed is resumed across the formation.</p>",
                 "Understood", "FLEET ADVISORY: Cargo secured. Speed restrictions lifted.")
             ScenEdit_SetKeyValue("REE_Timer_StormShipGUID", "")
+            ScenEdit_SetKeyValue("REE_Timer_StormCompGUID", "")
             ScenEdit_SetKeyValue("REE_Timer_StormEndHour", "-1")
         end
     end
@@ -665,9 +696,16 @@ end)
             name = "Suspicious Ship Intercept",
             canTrigger = function() return true end,
             execute = function()
-                local cLat, cLon = FindUKConvoyLeadOrCenter()
-                local spawnLat = cLat + (math.random(40, 60) / 60)
-                local spawnLon = cLon + (math.random(20, 50) / 60)
+                local cLat, cLon, leadUnit = FindUKConvoyLeadOrCenter()
+                local leadHdg = (leadUnit and leadUnit.heading and leadUnit.heading > 0) and leadUnit.heading or 195
+                local distNM = math.random(50, 100)
+                local spawnBrg = (leadHdg + math.random(-20, 20)) % 360
+                local radBrg = math.rad(spawnBrg)
+                local dLat = (distNM * math.cos(radBrg)) / 60
+                local dLon = (distNM * math.sin(radBrg)) / (60 * math.cos(math.rad(cLat)))
+                local spawnLat = cLat + dLat
+                local spawnLon = cLon + dLon
+
                 local trawler = ScenEdit_AddUnit({
                     type = "Ship",
                     name = "Unknown Merchant",
@@ -677,13 +715,14 @@ end)
                     longitude = spawnLon
                 })
                 if trawler then
-                    ScenEdit_SetUnit({ guid = trawler.guid, newheading = 180, newspeed = 12 })
+                    local retHdg = (spawnBrg + 180) % 360
+                    ScenEdit_SetUnit({ guid = trawler.guid, newheading = retHdg, newspeed = 12 })
                     ScenEdit_SetUnit({ guid = trawler.guid, course = { { lat = cLat, lon = cLon } } })
 
                     CreateDynamicRelativeTask({
                         taskType = "Intercept",
                         targetGuid = trawler.guid,
-                        distanceNM = 1.5,
+                        distanceNM = 3.0,
                         badge = "INTEL",
                         title = "Visual Classification: MV Mar Azul",
                         completionHtml =
@@ -694,7 +733,7 @@ end)
                     })
                 end
                 ShowModalDialog("INTEL", "Suspicious Merchant Heading for Task Force",
-                    "<p>Electronic surveillance and maritime tracking algorithms have flagged an unidentified surface vessel tracking directly on an intercept heading with our transport echelon.</p><p>Intelligence cannot rule out ELINT gathering or forward reporting for Argentine reconnaissance assets.</p><p><strong>Action Required:</strong> A designated identification zone has been established around the contact. <strong>Dispatch an air or surface asset into the zone to visually classify and verify the vessel.</strong></p>",
+                    "<p>Electronic surveillance and maritime tracking algorithms have flagged an unidentified surface vessel tracking directly on an intercept heading with our transport echelon.</p><p>Intelligence cannot rule out ELINT gathering or forward reporting for Argentine reconnaissance assets.</p><p><strong>Action Required:</strong> A designated identification zone has been established ahead of our formation. <strong>Dispatch an air or surface asset into the zone to visually classify and verify the vessel.</strong></p>",
                     "Acknowledge Orders")
             end
         },
@@ -716,7 +755,7 @@ end)
                         (u.subtype == "3002" or u.name:find("Point") or u.name:find("STUFT") or u.name:find("Bay"))
                 end)
                 if not stuft then return end
-                ScenEdit_SetUnit({ guid = stuft.guid, outofcomms = true })
+                ScenEdit_SetUnit({ guid = stuft.guid, outofcomms = true, group = "none", manualSpeed = "8" })
 
                 CreateDynamicRelativeTask({
                     taskType = "STUFT_Comms",
@@ -728,7 +767,7 @@ end)
                         "<p>A friendly unit has rendezvoused inside the designated support zone with <strong>%s</strong>.</p><p>Visual light signalling and close-range tactical UHF relay have re-aligned the merchant vessel's encrypted communications and satellite receivers. <strong>%s has rejoined the networked Tactical Picture.</strong></p>",
                         stuft.name, stuft.name),
                     extraActionLua = string.format(
-                    "pcall(function() ScenEdit_SetUnit({ guid = %q, outofcomms = false }) end)", stuft.guid)
+                    "pcall(function() ScenEdit_SetUnit({ guid = %q, outofcomms = false, manualSpeed = 'Off' }) end)", stuft.guid)
                 })
 
                 ShowModalDialog("WARNING", "STUFT Vessel Out of Comms: " .. stuft.name,
@@ -756,7 +795,7 @@ end)
                         (u.subtype == "3002" or u.name:find("Point") or u.name:find("Tide") or u.name:find("STUFT"))
                 end)
                 if not civShip then return end
-                ScenEdit_SetUnit({ guid = civShip.guid, manualSpeed = "5" })
+                ScenEdit_SetUnit({ guid = civShip.guid, group = "none", manualSpeed = "5" })
 
                 CreateDynamicRelativeTask({
                     taskType = "AuxPower",
@@ -796,14 +835,36 @@ end)
                         (u.name:find("Point") or u.name:find("Bay") or u.name:find("STUFT") or u.subtype == "3002")
                 end)
                 if not cargoShip then return end
+
+                local engComp = nil
+                local uFull = ScenEdit_GetUnit({ guid = cargoShip.guid })
+                if uFull and uFull.components then
+                    for _, comp in ipairs(uFull.components) do
+                        local ct = tostring(comp.comp_type or comp.type or ""):lower()
+                        local cn = tostring(comp.comp_name or comp.name or ""):lower()
+                        if ct:find("engine") or ct:find("propulsion") or cn:find("engine") or cn:find("propulsion") or cn:find("diesel") or cn:find("turbine") or cn:find("shaft") then
+                            engComp = comp.comp_guid or comp.guid
+                            break
+                        end
+                    end
+                end
+
+                if engComp then
+                    ScenEdit_SetUnitDamage({ guid = cargoShip.guid, dp = 0, components = { { engComp, '1' } } })
+                    ScenEdit_SetKeyValue("REE_Timer_StormCompGUID", engComp)
+                else
+                    ScenEdit_SetUnitDamage({ guid = cargoShip.guid, dp = 0, components = { { 'type', type = 'engine', 1 } } })
+                    ScenEdit_SetKeyValue("REE_Timer_StormCompGUID", "engine")
+                end
+
                 ScenEdit_SetUnit({ guid = cargoShip.guid, manualSpeed = "6" })
                 ScenEdit_SetKeyValue("REE_Timer_StormShipGUID", cargoShip.guid)
                 ScenEdit_SetKeyValue("REE_Timer_StormEndHour", tostring(currentHour + 8))
                 ShowModalDialog("WARNING", "Severe Atlantic Swell: Cargo Shift on " .. cargoShip.name,
                     string.format(
-                        "<p>Heavy South Atlantic swells exceeding Sea State 6 have caused container lashings on the forward deck of <strong>%s</strong> to part. Shifted cargo threatens hull stability.</p><p>The captain has reduced speed to <strong>6 knots</strong> while damage-control parties re-stow and weld security stays. Estimated repair time: <strong>8 in-game hours</strong>.</p>",
+                        "<p>Heavy South Atlantic swells exceeding Sea State 6 have caused container lashings on the forward deck of <strong>%s</strong> to part. Shifted cargo threatens hull stability.</p><p>Propulsion has been reduced to minimum steerageway while damage-control parties re-stow and weld security stays. Estimated repair time: <strong>8 hours</strong>.</p>",
                         cargoShip.name),
-                    "Acknowledge", "WEATHER ALERT: " .. cargoShip.name .. " slowed to 6 kts for cargo re-lashing.")
+                    "Acknowledge", "WEATHER ALERT: " .. cargoShip.name .. " slowed for cargo re-lashing.")
             end
         },
 
@@ -994,7 +1055,16 @@ end)
                     local u = ScenEdit_GetUnit({ guid = uDesc.guid })
                     if u and u.type == "Ship" then table.insert(ships, u) end
                 end
-                return #ships >= 2
+                if #ships < 2 then return false end
+                for i = 1, #ships - 1 do
+                    for j = i + 1, #ships do
+                        local rng = Tool_Range(ships[i].guid, ships[j].guid)
+                        if rng and rng <= 10 then
+                            return true
+                        end
+                    end
+                end
+                return false
             end,
             execute = function()
                 local ships = {}
@@ -1002,17 +1072,27 @@ end)
                     local u = ScenEdit_GetUnit({ guid = uDesc.guid })
                     if u and u.type == "Ship" then table.insert(ships, u) end
                 end
-                if #ships >= 2 then
-                    local s1 = ships[1]
-                    local s2 = ships[2]
-                    local dp1 = s1.damage.startdp * 0.95
-                    local dp2 = s2.damage.startdp * 0.95
+                local pairs = {}
+                for i = 1, #ships - 1 do
+                    for j = i + 1, #ships do
+                        local rng = Tool_Range(ships[i].guid, ships[j].guid)
+                        if rng and rng <= 10 then
+                            table.insert(pairs, { s1 = ships[i], s2 = ships[j], dist = rng })
+                        end
+                    end
+                end
+                if #pairs > 0 then
+                    local chosen = pairs[math.random(1, #pairs)]
+                    local s1 = chosen.s1
+                    local s2 = chosen.s2
+                    local dp1 = s1.damage.startdp * 0.05
+                    local dp2 = s2.damage.startdp * 0.05
                     ScenEdit_SetUnitDamage({ guid = s1.guid, dp = dp1, components = {} })
                     ScenEdit_SetUnitDamage({ guid = s2.guid, dp = dp2, components = {} })
                     ShowModalDialog("FLEET", "Ascension Anchorage Collision",
                         string.format(
-                            "<p>Harbour Master incident report from Clarence Bay, Ascension Island: During congested refuelling operations in dense tidal swell, <strong>%s</strong> and <strong>%s</strong> made physical contact.</p><p>Both vessels have sustained minor hull scraping and superficial plating indentations (approx 5%% damage). Watertight integrity remains intact and both units remain seaworthy.</p>",
-                            s1.name, s2.name),
+                            "<p>Harbour Master incident report from Clarence Bay, Ascension Island: During congested refuelling operations in dense tidal swell, <strong>%s</strong> and <strong>%s</strong> (operating within %.1f NM of each other) made physical contact.</p><p>Both vessels have sustained minor hull scraping and superficial plating indentations. Watertight integrity remains intact and propulsion and combat systems remain fully operational.</p>",
+                            s1.name, s2.name, chosen.dist),
                         "Review Damage", "PORT ACCIDENT: Minor docking collision reported at Ascension anchorage.")
                 end
             end
@@ -1044,11 +1124,11 @@ end)
                     CreateDynamicRelativeTask({
                         taskType = "SAR",
                         targetGuid = distressed.guid,
-                        distanceNM = 1.0,
+                        distanceNM = 2.0,
                         badge = "INTEL",
                         title = "SAR Mission Accomplished: MV Nordik",
                         completionHtml =
-                        "<p>Task Force SAR helicopters and rescue swimmers have entered the distress datum and completed survivor recovery operations.</p><p>All 24 civilian crew members from <em>MV Nordik</em> have been safely airlifted aboard for emergency medical evaluation. <strong>Command recognizes prompt humanitarian response: +50 Victory Points awarded.</strong></p>",
+                        "<p>Task Force SAR helicopters and rescue swimmers have entered the search box and completed survivor recovery operations.</p><p>All 24 civilian crew members from <em>MV Nordik</em> have been safely airlifted aboard for emergency medical evaluation. The maritime community and Ministry of Defence commend the Task Force's prompt humanitarian action.</p>",
                         extraActionLua = string.format([[
 pcall(function()
     local s = ScenEdit_GetScore(%q) or 0
@@ -1060,7 +1140,7 @@ end)
 
                 ShowModalDialog("WARNING", "MAYDAY: Civilian Vessel in Distress",
                     string.format(
-                        "<p>Emergency SOS broadcast intercepted from commercial bulk carrier <strong>MV Nordik</strong> approx <strong>%d NM</strong> from our formation.</p><p>The vessel reports a flooded engine space following a submerged container strike. <strong>Search and Rescue response requested:</strong> A SAR datum box has been established around the vessel. Dispatch a helicopter or surface ship into the box to assist survivors (+50 Victory Points).</p>",
+                        "<p>Emergency SOS broadcast intercepted from commercial bulk carrier <strong>MV Nordik</strong> approx <strong>%d NM</strong> from our formation.</p><p>The vessel reports catastrophic flooding in the engine spaces following a submerged container strike and is taking on water rapidly.</p><p><strong>Search and Rescue response requested:</strong> A designated search box has been marked around the vessel's last reported position. <strong>Dispatch an air or surface asset into the search box to assist survivors.</strong></p>",
                         dist),
                     "Authorize SAR")
             end
@@ -1088,15 +1168,83 @@ end)
         {
             id = "EVT_16",
             tier = 1,
-            name = "False Report of Submarine Contact (Biologic)",
+            name = "Subsurface Sonar Transient",
             canTrigger = function() return true end,
             execute = function()
-                local cLat, cLon = FindUKConvoyLeadOrCenter()
+                local ukShips = {}
+                for _, uDesc in ipairs(GetUKUnits()) do
+                    local u = ScenEdit_GetUnit({ guid = uDesc.guid })
+                    if u and u.type == "Ship" then table.insert(ukShips, u) end
+                end
+
+                local targetFleetUnit = nil
+                if #ukShips > 0 then
+                    local candidates = {}
+                    for _, s in ipairs(ukShips) do
+                        if s.name:find("Queen Elizabeth") or (s.group and s.group.lead == s.guid) then
+                            table.insert(candidates, s)
+                        end
+                    end
+                    if #candidates > 0 then
+                        targetFleetUnit = candidates[math.random(1, #candidates)]
+                    else
+                        targetFleetUnit = ukShips[math.random(1, #ukShips)]
+                    end
+                end
+
+                local fleetName = "the Carrier Strike Group"
+                local cLat, cLon = 5.0, -20.0
+                if targetFleetUnit then
+                    cLat = targetFleetUnit.latitude
+                    cLon = targetFleetUnit.longitude
+                    if targetFleetUnit.group and targetFleetUnit.group.name and targetFleetUnit.group.name ~= "" then
+                        fleetName = targetFleetUnit.group.name
+                    elseif targetFleetUnit.name:find("Queen Elizabeth") then
+                        fleetName = "Carrier Strike Group (HMS Queen Elizabeth)"
+                    else
+                        fleetName = string.format("Task Group (%s)", targetFleetUnit.name)
+                    end
+                else
+                    cLat, cLon = FindUKConvoyLeadOrCenter()
+                end
+
+                local sLat = cLat + 0.25
+                local sLon = cLon - 0.25
+                local isBiologic = (math.random(1, 2) == 1)
+
+                if isBiologic then
+                    local bio = ScenEdit_AddUnit({
+                        type = "Submarine",
+                        name = "Biological Contact (Whale Pod)",
+                        dbid = 92,
+                        side = CONFIG.NEUTRAL_SIDE,
+                        latitude = sLat,
+                        longitude = sLon,
+                        depth = -100
+                    })
+                    if bio then
+                        ScenEdit_SetUnit({ guid = bio.guid, newspeed = 3, newheading = math.random(0, 359) })
+                    end
+                else
+                    local sub = ScenEdit_AddUnit({
+                        type = "Submarine",
+                        name = "ARA Salta (Type 209)",
+                        dbid = 671,
+                        side = CONFIG.OPPOSING_SIDE,
+                        latitude = sLat,
+                        longitude = sLon,
+                        depth = -120
+                    })
+                    if sub then
+                        ScenEdit_SetUnit({ guid = sub.guid, newspeed = 4, newheading = math.random(180, 270) })
+                    end
+                end
+
                 ShowModalDialog("INTEL", "Sonar Contact Alert: Unconfirmed Transient",
                     string.format(
-                        "<p>Towed-array operators on our ASW frigate picket have reported an active biologic/subsurface acoustic anomaly 15 NM Northwest of the convoy (Lat: %.2f, Lon: %.2f).</p><p>Tactical processing suggests a deep-diving sperm whale pod mimicking diesel submarine propulsion transients. Frigate ASW helicopters are conducting confirmation dipping-sonar passes.</p>",
-                        cLat + 0.25, cLon - 0.25),
-                    "Verify Contact", "ASW NOTICE: Biological sonar contact mimicking SSK signature.")
+                        "<p>Towed-array and hull sonar operators on the ASW picket screen for <strong>%s</strong> detected an unconfirmed submerged acoustic transient approx 15 NM Northwest of the formation (Lat: %.2f, Lon: %.2f).</p><p>The contact was very brief and has since disappeared from tactical displays, slipping beneath the local thermal layer. Acoustic processing recorded brief blade-rate harmonics consistent with either deep-diving marine biologics or a slow-moving diesel-electric submarine operating on battery.</p><p><strong>Action Required:</strong> The contact is no longer painted on tactical displays. <strong>Dispatch ASW helicopters or escort frigates to prosecute the datum with sonobuoys and dipping sonar to reacquire and classify the contact.</strong></p>",
+                        fleetName, sLat, sLon),
+                    "Verify Contact", "ASW NOTICE: Submerged acoustic transient detected near " .. fleetName)
             end
         },
 
@@ -1210,10 +1358,14 @@ end)
             tier = 2,
             name = "Fight on Cramped Troop Transport",
             canTrigger = function()
-                return FindUKUnitMatching(function(u) return u.name:find("Bay") or u.name:find("Lyme") end) ~= nil
+                return FindUKUnitMatching(function(u)
+                    return u.type == "Ship" and (u.name:find("Lyme") or u.name:find("Bay"))
+                end) ~= nil
             end,
             execute = function()
-                local bay = FindUKUnitMatching(function(u) return u.name:find("Bay") or u.name:find("Lyme") end)
+                local bay = FindUKUnitMatching(function(u)
+                    return u.type == "Ship" and (u.name:find("Lyme") or u.name:find("Bay"))
+                end)
                 local shipName = bay and bay.name or "RFA Lyme Bay"
                 ShowModalDialog("FLEET", "Internal Incident: Cramped Quarters on " .. shipName,
                     string.format(
@@ -1235,7 +1387,7 @@ end)
 
                 local drone = ScenEdit_AddUnit({
                     type = "Aircraft",
-                    name = "Adversary Recon UAV",
+                    name = "Unidentified Air Contact",
                     dbid = 4724,
                     loadoutid = 13989,
                     side = CONFIG.OPPOSING_SIDE,
@@ -1248,9 +1400,9 @@ end)
                     ScenEdit_SetUnit({ guid = drone.guid, course = { { lat = cLat, lon = cLon } } })
                 end
 
-                ShowModalDialog("WARNING", "Tactical Air Contact: Long-Range Reconnaissance UAV",
-                    "<p>Air defense radars have detected a slow-moving, high-altitude radar contact approximately 140 NM to the South, tracking directly towards the carrier formation.</p><p>Intelligence indicates Argentina has deployed long-endurance reconnaissance drones to acquire targeting coordinates for mainland anti-ship missile regiments. <strong>Combat Air Patrols are directed to intercept and achieve Precise ID classification.</strong></p>",
-                    "Scramble Interceptors", "AIR CONTACT: Long-range reconnaissance drone tracking toward Task Force.")
+                ShowModalDialog("WARNING", "Tactical Air Contact: Unidentified Air Contact",
+                    "<p>Air defense surveillance radars have detected an unidentified high-altitude, medium-speed air contact approximately 140 NM to the South, tracking directly towards the carrier task group.</p><p>The contact has not squawked an IFF transponder and remains unclassified. Combat Air Patrols (F-35B) or escort fighters are directed to vector toward the contact and achieve visual or electronic identification.</p><p><strong>Rules of Engagement:</strong> If positive identification confirms an Argentine military reconnaissance platform or hostile surveillance asset, weapons release is authorized immediately to neutralize the threat and preserve Task Force emission security.</p>",
+                    "Scramble Interceptors", "AIR CONTACT: Unidentified long-range air contact tracking toward Task Force.")
             end
         },
 
@@ -1277,7 +1429,7 @@ end)
                 end
 
                 ShowModalDialog("INTEL", "Radar Contact: Unidentified Fast Surface Target",
-                    "<p>Surface search radar has picked up an intermittent contact exhibiting anomalous radar reflectivity in our forward transit corridor.</p><p><strong>Rules of Engagement Reminder:</strong> Ensure visual or forward-looking infrared (FLIR) verification prior to weapons release. Neutral shipping continues to traverse South Atlantic routes; destruction of innocent civilian vessels will incur severe political and score penalties (-50 VP).</p>",
+                    "<p>Surface search radar has picked up an intermittent contact exhibiting anomalous radar reflectivity in our forward transit corridor.</p><p><strong>Rules of Engagement Reminder:</strong> Ensure visual or forward-looking infrared (FLIR) verification prior to weapons release. Neutral shipping continues to traverse South Atlantic routes; destruction of innocent civilian vessels will cause severe diplomatic and political backlash.</p>",
                     "Enforce Strict RoE", "SURFACE WARNING: Contact detected in transit corridor. Strict RoE in effect.")
             end
         },
@@ -1310,7 +1462,7 @@ end)
                     CreateDynamicRelativeTask({
                         taskType = "TrawlerHarass",
                         targetGuid = trawler.guid,
-                        distanceNM = 0.75,
+                        distanceNM = 2.0,
                         badge = "WARNING",
                         title = "Harassment Intercepted: Mar de Plata",
                         completionHtml =
@@ -1347,12 +1499,12 @@ end)
                 end)
                 if not playerShip then return end
 
-                local newDp = playerShip.damage.startdp * 0.90
+                local newDp = playerShip.damage.startdp * 0.10
                 ScenEdit_SetUnitDamage({ guid = playerShip.guid, dp = newDp, components = {} })
 
                 ShowModalDialog("DANGER", "Collision Incident: Shadow Trawler Ramming",
                     string.format(
-                        "<p>Emergency casualty report from <strong>%s</strong>: An unflagged steel-hulled fishing vessel deliberately cut across the ship's port quarter, glancing off the hull before drifting clear with heavy engine fires.</p><p><strong>%s</strong> sustained 10%% structural plating damage, but hull integrity is secure. The rogue trawler has broken off and is dead in the water.</p>",
+                        "<p>Emergency casualty report from <strong>%s</strong>: An unflagged steel-hulled fishing vessel deliberately cut across the ship's port quarter, glancing off the hull before drifting clear with heavy engine fires.</p><p><strong>%s</strong> sustained minor structural plating damage, but hull integrity is secure. The rogue trawler has broken off and is dead in the water.</p>",
                         playerShip.name, playerShip.name),
                     "Assess Damage",
                     "COLLISION CASUALTY: " .. playerShip.name .. " damaged in glancing strike by rogue vessel.")
@@ -1373,7 +1525,7 @@ end)
                     local sLon = cLon + (math.random(20, 35) / 60)
                     local sub = ScenEdit_AddUnit({
                         type = "Submarine",
-                        name = "SSN 751 San Juan",
+                        name = "Unidentified Submerged Contact",
                         dbid = 837,
                         side = CONFIG.NEUTRAL_SIDE,
                         latitude = sLat,
@@ -1383,9 +1535,9 @@ end)
                     if sub then
                         ScenEdit_SetUnit({ guid = sub.guid, newheading = 270, newspeed = 6 })
                     end
-                    ShowModalDialog("INTEL", "Acoustic Detection: Submerged Nuclear Submarine",
-                        "<p>Subsurface acoustic signature detected by escort sonobuoys 25 NM from fleet. Hydrophone analysis indicates a modern nuclear attack submarine on a quiet westerly transit.</p><p>IFF interrogation and underwater telephone pinging confirm contact is an <strong>Allied United States Navy submarine</strong> operating under independent sovereign transit. Do not engage.</p>",
-                        "Confirm Neutrality", "ASW NOTICE: Neutral Allied nuclear submarine contact confirmed on flank.")
+                    ShowModalDialog("INTEL", "Acoustic Detection: Submerged Contact",
+                        "<p>Subsurface acoustic signature detected by escort sonobuoys approximately 25 NM from the Task Force. Hydrophone analysis indicates a submerged contact on a quiet westerly transit.</p><p>Tactical classification remains unconfirmed. <strong>Maintain tracking and verify contact identity prior to any escalation.</strong></p>",
+                        "Acknowledge", "ASW NOTICE: Unidentified submerged contact detected on flank.")
                 else
                     ShowModalDialog("INTEL", "ASW Prosecution: False Transient",
                         "<p>P-8A Poseidon and Merlin HM.2 ASW aircraft investigated an anomalous passive sonar transient 30 NM ahead of the Task Force.</p><p>Multiple active sonobuoy drops and MAD passes yielded zero magnetic or acoustic returns. Contact classified as false alarm caused by deep ocean internal waves.</p>",
@@ -1536,7 +1688,7 @@ end)
         end
     else
         if CONFIG.DEV_MODE then
-            DevLog(string.format("No event scheduled for Hour %d. (Tip: set KVS 'REE_DEV_FORCE_EVENT_HOURLY'='true' to force hourly execution)", currentHour))
+            DevLog(string.format("No event scheduled for Hour %d. (Dev Mode hourly runner can be toggled via 'REE_DEV_HOURLY_OFF'='true')", currentHour))
         end
     end
 

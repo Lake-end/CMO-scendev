@@ -1,2 +1,2 @@
 - Warning when ships fuel gets low to prod player to UNREP
-- 
+- Pre-Release Packaging Sweep: Replace all ScenEdit_RunScript loaders with inline Lua in CMO Event Actions, and set FALKL_DEV_MODE = "false".

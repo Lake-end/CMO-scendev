@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 3: CORE ENGINE LOOP (SELF-CONTAINED) v3
+-- SCRIPT 3: CORE ENGINE LOOP (SELF-CONTAINED) v4
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -278,8 +278,7 @@ function GCE_RunEngineCycle()
                 supplied    = isSuppliedNow,
                 supplyTimer = supplyTimer,
                 mods        = modsString,
-                status      = statusStr,
-                unitsCount  = (unitsInZone and #unitsInZone or 0)
+                status      = statusStr
             })
         end
     end -- <-- THIS IS THE END OF YOUR ZONE PROCESSING LOOP
@@ -324,8 +323,8 @@ function GCE_RunEngineCycle()
             local modStr = z.mods ~= "" and (" [" .. z.mods .. "]") or ""
             print(string.format("  %-20s | %-12s | %-14s | %-16s | %s%s",
                 z.name:gsub("ZONE_", ""), ctrlShiftStr, basePwrStr, effPwrStr, z.status, modStr))
-            print(string.format("    -> Modifiers: ISR(x%.2f) CAS(x%.2f) NGFS(x%.2f) Morale(x%.2f) | SupplyTether: %dh | UnitsInArea: %d",
-                z.globalSA, z.casMod, z.ngfsMod, z.morale, z.supplyTimer, z.unitsCount))
+            print(string.format("    -> Modifiers: ISR(x%.2f) CAS(x%.2f) NGFS(x%.2f) Morale(x%.2f) | SupplyTether: %dh",
+                z.globalSA, z.casMod, z.ngfsMod, z.morale, z.supplyTimer))
         end
         print("-----------------------------------------------------------------------------------------")
         print(string.format("  STRATEGIC VICTORY PROGRESS: %d / 11 Zones Secured | Stanley: %s | Pleasant: %s (Threshold: 8)",

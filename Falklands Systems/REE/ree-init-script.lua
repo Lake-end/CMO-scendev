@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: RANDOM EVENT ENGINE (REE)
--- SCRIPT 1: MASTER INITIALIZATION & KVS SEEDING v2
+-- SCRIPT 1: MASTER INITIALIZATION & KVS SEEDING v3
 -- ==============================================================================
 -- PURPOSE:
 -- Seeds the CMO Key-Value Store (KVS) with baseline tracking variables for the
@@ -42,9 +42,8 @@ end
 
 -- 1.1 GLOBAL DEVELOPER MODE (Default: true for testing; set to "false" manually for release)
 SafeInitKey("FALKL_DEV_MODE", "true")
-SafeInitKey("REE_DEV_FORCE_EVENT_HOURLY", "false") -- Set to "true" to trigger an event every hour in Dev Mode
 SafeInitKey("REE_DEV_FORCE_SEQUENTIAL", "false")   -- Set to "true" to test all events sequentially (EVT_01 -> EVT_29)
-LogInit("Global Developer Mode (FALKL_DEV_MODE): " .. ScenEdit_GetKeyValue("FALKL_DEV_MODE"))
+LogInit("Global Developer Mode (FALKL_DEV_MODE): " .. ScenEdit_GetKeyValue("FALKL_DEV_MODE") .. " (Hourly event runner active by default)")
 
 SafeInitKey("REE_INITIALIZED", "true")
 SafeInitKey("REE_SCENARIO_HOUR", "0")

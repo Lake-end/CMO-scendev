@@ -688,6 +688,7 @@
     <!-- Slot for Lua string.format injection (AI-html-lua-reference line 69-79) -->
     <input type="hidden" id="model_data" value="%s">
     <input type="hidden" id="ctfs_payload" name="ctfs_payload" value="">
+    <input type="hidden" id="ctfs_launched" name="ctfs_launched" value="false">
     <input type="hidden" id="ctfs_points" name="ctfs_points" value="0">
     <input type="hidden" id="ctfs_hours" name="ctfs_hours" value="0">
 
@@ -770,9 +771,9 @@
             <div class="threat-pill" id="pill-40" data-pts="40" data-debug="40 pts: San Carlos Minefield (15x)"
                 data-intel="[CLASSIFIED: Littoral Denial Activity]">40 pts: San Carlos Minefield (15x)</div>
             <div class="threat-pill" id="pill-50" data-pts="50" data-debug="50 pts: ARG Side -> Veteran"
-                data-intel="[THEATER READINESS: Ground Forces Elevate to Veteran]">50 pts: ARG Side -> Veteran</div>
+                data-intel="[THEATER READINESS: Ground Forces Dig In]">50 pts: ARG Side -> Veteran</div>
             <div class="threat-pill" id="pill-60" data-pts="60" data-debug="60 pts: SPYDER-MR (Tumbledown)"
-                data-intel="[CLASSIFIED: Long-Range Radar & SAM Deployment]">60 pts: SPYDER-MR (Tumbledown)</div>
+                data-intel="[CLASSIFIED: GBAD Reinforcements]">60 pts: SPYDER-MR (Tumbledown)</div>
             <div class="threat-pill" id="pill-70" data-pts="70" data-debug="70 pts: ARA Salta Submarine"
                 data-intel="[INTEL GAP: Subsurface Acoustic Anomaly]">70 pts: ARA Salta Submarine</div>
             <div class="threat-pill" id="pill-75" data-pts="75" data-debug="75 pts: ARA San Luis Submarine"
@@ -782,7 +783,7 @@
             <div class="threat-pill" id="pill-95" data-pts="95" data-debug="95 pts: RBS 70 NG MANPADS"
                 data-intel="[CLASSIFIED: Port Point Defense Hardened]">95 pts: RBS 70 NG MANPADS</div>
             <div class="threat-pill" id="pill-99" data-pts="99" data-debug="99 pts: ARG Side -> Ace"
-                data-intel="[THEATER READINESS: Maximum War Footing (Ace)]">99 pts: ARG Side -> Ace</div>
+                data-intel="[THEATER READINESS: Maximum War Footing]">99 pts: ARG Side -> Ace</div>
         </div>
     </div>
 
@@ -1435,6 +1436,7 @@
 
             // Synchronize final hidden inputs
             document.getElementById('ctfs_payload').value = encodedPayload;
+            document.getElementById('ctfs_launched').value = "true";
             document.getElementById('ctfs_points').value = payload.totalPoints.toString();
             document.getElementById('ctfs_hours').value = (payload.totalPoints * HOURS_PER_POINT).toString();
 
@@ -1575,8 +1577,8 @@
                             <div style="color: #ffffff; font-size: 15px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">
                                 ORDERS TRANSMITTED - TASK FORCE DEPLOYED
                             </div>
-                            <div style="color: #a7f3d0; font-size: 12px; margin-top: 4px; font-weight: 600;">
-                                You can safely close this window
+                            <div style="color: #a7f3d0; font-size: 13px; margin-top: 6px; font-weight: 600;">
+                                You can close this window
                             </div>
                         </div>
 

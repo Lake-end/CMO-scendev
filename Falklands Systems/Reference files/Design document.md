@@ -136,4 +136,56 @@ To accelerate balancing and verification without leaking classified mechanics or
 *   **GCE Consumption:** Logs unit-by-unit infiltration events with matched power points and physical map deletions.
 *   **GCE AI Director:** Logs mainland reinforcement flights to West Falkland and strategic power diversions from Stanley.
 *   **Generic UK Loss Tracker:** Logs casualty category, penalty points assessed, and threshold progress percentage.
-*   **REE (Random Event Engine):** Exposes candidate pool analytics and unlocks the hourly sequential test runner (`REE_DEV_FORCE_EVENT_HOURLY` and `REE_DEV_FORCE_SEQUENTIAL`), managed via `ree-test-runner.lua`.
+*   **REE (Random Event Engine):** Exposes candidate pool analytics and unlocks the hourly sequential test runner (`REE_DEV_FORCE_EVENT_HOURLY` and `REE_DEV_FORCE_SEQUENTIAL`), managed via `ree-test-runner.lua`.
+
+---
+
+## 8. SCENARIO DEVELOPMENT WORKFLOW & RELEASE PACKAGING
+
+To balance fast iteration with a completely self-contained final product, the project follows a two-stage lifecycle:
+
+### 8.1 Active Development & Testing Phase (Current Workflow)
+During active development, testing, and balancing:
+1. **Use `ScenEdit_RunScript` in CMO Event Actions:**
+   Events in CMO trigger a lightweight loader stub pointing to disk files:
+   ```lua
+   -- Example: Event Action (A_Open_CTFS_Dialog)
+   if ScenEdit_RunScript("Development\\Global\\Falklands Systems\\CTFS\\core.lua") then
+       CTFS.OpenDialog()
+   end
+   ```
+2. **Always Use `CTFS.OpenDialog()` Instead of `CTFS.OpenUI()`:**
+   - `CTFS.OpenDialog()` invokes the modal HTML dialog, which **automatically pauses the CMO simulation clock** and prevents time from elapsing while the player configures the fleet.
+   - `CTFS.OpenUI()` creates a modeless dialog where the game clock continues to tick in the background.
+3. **Developer Mode Flag:**
+   Keep `FALKL_DEV_MODE = "true"` active in the Key-Value store to enable verbose logging, full GCE telemetry, and REE test facilities.
+4. **Instant Iteration:**
+   Edits made in external IDEs take effect immediately on scenario reload or tick without needing to copy-paste scripts into CMO after every change.
+
+### 8.2 Final Scenario Release Packaging (One-Time Pre-Release Sweep)
+Before distributing the scenario to players:
+1. **One-Time Inline Script Paste:**
+   CMO scenario files (`.scen`) are XML packages containing embedded `<ScriptText>` tags. For release, do a single comprehensive sweep where the full contents of each completed `.lua` file are pasted directly into its corresponding Lua Script Action in the CMO Event Manager.
+2. **Zero-Dependency Guarantee:**
+   Pasting inline removes all references to `Development\` paths on disk, ensuring the scenario runs out-of-the-box for any player downloading `Falklands 27.scen` on Steam Workshop or the Matrix Games forums.
+3. **Deactivate Developer Mode:**
+   Prior to saving the release `.scen` file, execute in the Lua console:
+   ```lua
+   ScenEdit_SetKeyValue("FALKL_DEV_MODE", "false")
+   ScenEdit_SetKeyValue("REE_DEV_FORCE_EVENT_HOURLY", "false")
+   ScenEdit_SetKeyValue("REE_DEV_FORCE_SEQUENTIAL", "false")
+   ```
+   This ensures end-users see clean military UI, standard combat telemetry, and organic randomized event scheduling without debug messages.
+
+### 8.3 In-Game Event Action to Script Mapping Reference
+
+| In-Game Event Action Name | Source Script on Disk | Release Inline Mode |
+| :--- | :--- | :--- |
+| **A_Init_Scenario_KVS** | `REE\ree-init-script.lua` | Paste inline |
+| **A_Open_CTFS_Dialog** | `CTFS\core.lua` (calls `CTFS.OpenDialog()`) | Paste inline |
+| **A_GCE_Master_Loop** | `GCE\core-engine-loop.lua` | Paste inline |
+| **A_GCE_Unit_Consumption** | `GCE\consumption.lua` | Paste inline |
+| **A_GCE_Counter_Offensive** | `GCE\counter-offensive.lua` | Paste inline |
+| **A_REE_Master_Ticker** | `REE\master-ticker.lua` | Paste inline |
+| **A_UK_Loss_Tracker** | `Generic\uk-loss-tracker.lua` | Paste inline |
+

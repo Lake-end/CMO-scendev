@@ -421,7 +421,12 @@ pcall(function() ScenEdit_SpecialMessage(playerSide, htmlContent) end)
 ### 11.5 Embedded WebView2 UI State Management & IPC
 When building rich custom HTML/JS dialogs embedded into CMO (via WebView2 or browser controls):
 1. **Button State Transitions & View Replacement**: Any execution button (such as a launch button) should immediately disable itself and either transition visually (e.g., red to green, updated action text) or transition the entire DOM into the post-action operational report.
-2. **IPC Messaging (`DIALOG_OK`)**: Post the bridge message (`window.chrome.webview.postMessage("DIALOG_OK" + ...)`) concurrently or immediately after DOM mutations to ensure the user sees confirmation even if the bridge closes or unloads the view.
+2. **Modal Dialog Titlebar `[X]` Closure Gotcha (`UI_CallAdvancedHTMLDialog`)**:
+   - In `UI_CallAdvancedHTMLDialog(title, html, buttonArray)`, the third parameter creates native buttons at the bottom of the dialog window.
+   - If the HTML document contains its own in-page action button (`<button onclick="...">`) that transitions the UI and instructs the player to "close this window", players will instinctively close the dialog using the native Windows titlebar close button `[X]`.
+   - When closed via `[X]`, CMO sets `return_table['pressed'] = ""` (or `nil`), NOT the string from `buttonArray`.
+   - **Crucial Rule**: The in-HTML action handler MUST write a completion flag into an `<input type="hidden" name="action_completed" value="true">`. The Lua host script must inspect `return_table['action_completed'] == "true"` in addition to `return_table['pressed']` so that the action executes reliably even if the dialog was closed via `[X]`.
+3. **IPC Messaging (`DIALOG_OK`)**: Post the bridge message (`window.chrome.webview.postMessage("DIALOG_OK" + ...)`) concurrently or immediately after DOM mutations for non-modal views (`ScenEdit_SpecialMessage`). Note that modal `UI_CallAdvancedHTMLDialog` does not process `postMessage` asynchronously during `ShowDialog()`.
 
 ### 11.6 Headless Testing & NLua Engine in PowerShell
 When running automated unit tests for CMO Lua scripts on Windows outside the game client:
@@ -753,3 +758,126 @@ ScenEdit_SetKeyValue("REE_DEV_FORCE_EVENT_HOURLY", "false")
 ScenEdit_SetKeyValue("REE_DEV_FORCE_SEQUENTIAL", "false")
 ```
 All debug console prints and un-redacted developer UI panels instantly deactivate.
+
+---
+
+## 19. Advanced Dynamic Event & Unit Mechanics
+
+### 19.1 Relative Reference Points (`relativeTo`) for Moving Zones
+- **Moving Objective Zones:** When a task requires the player to intercept, inspect, or rendezvous with a moving vessel (e.g. an unidentified merchant, adversary trawler, or distressed ship), pass `relativeTo = targetGuid` and `bearingType = 0` (fixed True North orientation) instead of static geographic coordinates (`centerLat`, `centerLon`):
+  ```lua
+  ScenEdit_AddReferencePoint({
+      side = "UK",
+      name = rpName,
+      relativeTo = targetGuid,
+      bearing = bearingDeg,
+      distance = distNM,
+      bearingType = 0,
+      bearingtype = 0,
+      highlighted = true
+  })
+  ```
+- The CMO engine dynamically computes the reference point's latitude and longitude from the target unit's live position on every simulation tick, moving the 4-point bounding box smoothly across the map with the ship.
+
+### 19.2 Formation Self-Triggering Prevention on Dynamic Relative Tasks
+When creating an area trigger (`UnitEntersArea`, `TargetSide = "UK"`) around a friendly ship (e.g. a STUFT vessel whose comms have failed) that was sailing in a convoy formation:
+- **The Failure Modes:**
+  1. The distressed unit itself belongs to side `UK` and is inside the bounding box.
+  2. Sister convoy ships and escorts sailing in the same group or formation are already physically within 0.5–1.0 NM of the ship at the exact second the event is created.
+  3. `ScenEdit_UnitX()` could evaluate to `nil` or the group descriptor, bypassing simple equality checks if not strictly guarded.
+- **The Comprehensive Engine Solution:**
+  1. **Detach and Slow Down:** In the event execution script, detach the distressed ship from its group and reduce speed so the rest of the fleet naturally pulls ahead:
+     ```lua
+     ScenEdit_SetUnit({ guid = stuft.guid, outofcomms = true, group = "none", manualSpeed = "8" })
+     ```
+  2. **Multi-Layer Action Script Guard:**
+     ```lua
+     local uX = ScenEdit_UnitX()
+     if not uX then return end -- Never complete if unit descriptor is missing
+
+     local targetGuid = "TARGET-GUID"
+     local uGuid = tostring(uX.guid or ""):lower()
+     local tGuid = tostring(targetGuid or ""):lower()
+
+     -- Ignore distressed ship itself or its group
+     if tGuid ~= "" and (uGuid == tGuid or (uX.group and tostring(uX.group.guid or ""):lower() == tGuid)) then
+         return
+     end
+
+     -- Ship Cooldown Guard: Ignore adjacent convoy ships during the initial 10 minutes (600s).
+     -- Dispatched helicopters/aircraft can resolve at any time.
+     local createdTime = 1234567890
+     local now = tonumber(ScenEdit_CurrentTime()) or 0
+     if uX.type == "Ship" and createdTime > 0 and (now - createdTime) < 600 then
+         return
+     end
+     ```
+
+### 19.3 `ScenEdit_SetUnitDamage` Damage Points (`dp`) Semantic
+In CMO, the `dp` argument in `ScenEdit_SetUnitDamage` represents **accumulated damage points**, NOT remaining structural integrity:
+- `dp = 0`: Unit is completely pristine (0 damage taken).
+- `dp = unit.damage.startdp * 0.05`: Unit has suffered **5% damage** (95% structural integrity remaining).
+- `dp = unit.damage.startdp * 0.95`: Unit has suffered **95% catastrophic damage** (only 5% health remaining, on the verge of sinking).
+- When simulating minor collisions or superficial damage, always set `dp = startdp * fraction_of_damage` (e.g. `0.05` for 5% damage).
+
+### 19.4 Embarked Aircraft String Name Collisions
+In CMO scenarios, embarked aircraft automatically inherit their host vessel's name in their unit name:
+- Example: Embarked RQ-20 Puma UAVs on *RFA Lyme Bay* are named `RFA Lyme Bay Puma UAV (700X NAS) #4`.
+- **The Pitfall:** Searching for a ship with `u.name:find("Bay")` or `u.name:find("Lyme")` without verifying `u.type` will often match an embarked aircraft instead of the ship itself.
+- **The Engine Solution:** Always filter by `u.type == "Ship"` when targeting surface vessels:
+  ```lua
+  local ship = FindUKUnitMatching(function(u)
+      return u.type == "Ship" and (u.name:find("Lyme") or u.name:find("Bay"))
+  end)
+  ```
+
+### 19.5 Pairwise Proximity Filtering for Inter-Unit Events
+When selecting two units for an interactive event (such as an anchorage collision, replenishment mishap, or escort handover):
+- Never simply select `units[1]` and `units[2]` from the global side roster. They may belong to separate task groups hundreds of nautical miles apart.
+- Test pairwise distances using `Tool_Range(u1.guid, u2.guid) <= MAX_RANGE_NM` in both `canTrigger` and `execute` before assigning the event:
+  ```lua
+  local pairs = {}
+  for i = 1, #ships - 1 do
+      for j = i + 1, #ships do
+          local dist = Tool_Range(ships[i].guid, ships[j].guid)
+          if dist and dist <= 10 then
+              table.insert(pairs, { s1 = ships[i], s2 = ships[j], dist = dist })
+          end
+      end
+  end
+  ```
+
+---
+
+## 20. Development Workflow vs. Production Scenario Packaging
+
+### 20.1 Active Development Iteration (`ScenEdit_RunScript`)
+During active scenario construction, testing, and balance tuning:
+- **Keep Event Actions as External File Loaders:**
+  Instead of pasting thousands of lines of Lua into CMO's Event Action dialog, use lightweight wrapper actions:
+  ```lua
+  -- Event Action (A_Open_CTFS_Dialog)
+  if ScenEdit_RunScript("Development\\Global\\Falklands Systems\\CTFS\\core.lua") then
+      CTFS.OpenDialog()
+  end
+  ```
+- **Clock Pausing: `CTFS.OpenDialog()` vs `CTFS.OpenUI()`:**
+  - `CTFS.OpenDialog()` invokes `UI_CallAdvancedHTMLDialog()`, which is **modal**; the CMO game engine pauses the simulation clock and blocks input until the player accepts or closes the dialog.
+  - `CTFS.OpenUI()` creates a modeless dialog where the scenario clock continues to tick in the background. For task force selection at scenario start, **always invoke `CTFS.OpenDialog()`**.
+- **Instant Code Updates:**
+  Edits saved in the IDE/codebase take effect immediately when the trigger fires or when the scenario is reloaded, completely avoiding the need to manually update CMO Event Actions during development.
+
+### 20.2 Release Scenario Packaging Sweep (Inline Embedding)
+CMO scenarios (`.scen`) are XML documents that store Lua event actions as embedded `<ScriptText>` properties. If a scenario is distributed while still referencing `ScenEdit_RunScript("Development\\...")`, it will fail for end-users who do not have the development folder on disk.
+
+**Pre-Release Deployment Procedure:**
+1. **One-Time Paste Sweep:** Copy the full text of each finished `.lua` file and paste it directly into its corresponding Lua Script Action in the CMO Event Manager.
+2. **Deactivate Developer Mode:**
+   In the CMO Lua console, set:
+   ```lua
+   ScenEdit_SetKeyValue("FALKL_DEV_MODE", "false")
+   ScenEdit_SetKeyValue("REE_DEV_FORCE_EVENT_HOURLY", "false")
+   ScenEdit_SetKeyValue("REE_DEV_FORCE_SEQUENTIAL", "false")
+   ```
+3. **Save Scenario:** Save `Falklands 27.scen`. The scenario is now 100% self-contained, zero-dependency, and ready for public distribution.
+

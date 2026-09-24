@@ -1,5 +1,5 @@
 -- =============================================================================
--- CTFS (Carrier Task Force Selector) - Master Backend Engine (Falklands 2027) v2
+-- CTFS (Carrier Task Force Selector) - Master Backend Engine (Falklands 2027) v5
 -- =============================================================================
 -- ARCHITECTURE:
 -- Implements the Command: Modern Operations (CMO) HTML UI Reference Architecture:
@@ -776,7 +776,16 @@ function CTFS.ExecuteTimeJump(pointsSpent)
     local dateStr = os.date("!%d.%m.%Y", newTime)
     local timeStr = os.date("!%H:%M:%S", newTime)
 
-    ScenEdit_SetTime({ Date = dateStr, Time = timeStr })
+    pcall(function()
+        ScenEdit_SetTime({ DateFormat = "DDMMYYYY", Date = dateStr, Time = timeStr, StartDate = dateStr })
+    end)
+    pcall(function()
+        ScenEdit_SetTime({ Date = dateStr, Time = timeStr })
+    end)
+    if CTFS.DEBUG_MODE then
+        print(string.format("[CTFS DEV] Scenario clock advanced: +%d hrs (%d pts spent) -> %s %sZ",
+            hoursToDelay, pointsSpent, dateStr, timeStr))
+    end
     return hoursToDelay, dateStr, timeStr
 end
 
@@ -1062,6 +1071,11 @@ function CTFS.ProcessOrder(selections)
         return false
     end
 
+    if CTFS.DEBUG_MODE then
+        print(string.format("[CTFS DEV] Beginning Task Force staging: %d unit entries, %d points spent.",
+            #verified.units, verified.totalPoints))
+    end
+
     -- 2. Time Jump & Escalation Matrix Execution
     local hoursDelayed, dateStr, timeStr = CTFS.ExecuteTimeJump(verified.totalPoints)
     CTFS.ApplyArgentineBoons(verified.totalPoints)
@@ -1135,6 +1149,9 @@ function CTFS.ProcessOrder(selections)
             if newUnit then
                 spawnedUnits[unitName] = newUnit.guid
                 spawnedUnits[item.name] = newUnit.guid
+                if CTFS.DEBUG_MODE then
+                    print(string.format("  [+] SPAWNED %s: %s (DBID %d) at (%s, %s)", item.type, unitName, item.dbid, tostring(lat), tostring(lon)))
+                end
 
                 -- 5a. Form Baseline Fleet Groups (excluding forward Falklands assets)
                 -- RFA Lyme Bay forms "Amphibious Assault Group" at FLEET_SPAWN2
@@ -1247,6 +1264,9 @@ function CTFS.ProcessOrder(selections)
 
             if newUnit then
                 spawnedUnits[unitName] = newUnit.guid
+                if CTFS.DEBUG_MODE then
+                    print(string.format("  [+] STAGED AIRCRAFT: %s (DBID %d) on %s (loadout %d)", unitName, entry.dbid, entry.hostName, entry.loadoutid or 0))
+                end
             end
         end
     end
@@ -2007,6 +2027,7 @@ CTFS.HTML_TEMPLATE = [==[
     <!-- Slot for Lua string.format injection (AI-html-lua-reference line 69-79) -->
     <input type="hidden" id="model_data" value="%s">
     <input type="hidden" id="ctfs_payload" name="ctfs_payload" value="">
+    <input type="hidden" id="ctfs_launched" name="ctfs_launched" value="false">
     <input type="hidden" id="ctfs_points" name="ctfs_points" value="0">
     <input type="hidden" id="ctfs_hours" name="ctfs_hours" value="0">
 
@@ -2089,9 +2110,9 @@ CTFS.HTML_TEMPLATE = [==[
             <div class="threat-pill" id="pill-40" data-pts="40" data-debug="40 pts: San Carlos Minefield (15x)"
                 data-intel="[CLASSIFIED: Littoral Denial Activity]">40 pts: San Carlos Minefield (15x)</div>
             <div class="threat-pill" id="pill-50" data-pts="50" data-debug="50 pts: ARG Side -> Veteran"
-                data-intel="[THEATER READINESS: Ground Forces Elevate to Veteran]">50 pts: ARG Side -> Veteran</div>
+                data-intel="[THEATER READINESS: Ground Forces Dig In]">50 pts: ARG Side -> Veteran</div>
             <div class="threat-pill" id="pill-60" data-pts="60" data-debug="60 pts: SPYDER-MR (Tumbledown)"
-                data-intel="[CLASSIFIED: Long-Range Radar & SAM Deployment]">60 pts: SPYDER-MR (Tumbledown)</div>
+                data-intel="[CLASSIFIED: GBAD Reinforcements]">60 pts: SPYDER-MR (Tumbledown)</div>
             <div class="threat-pill" id="pill-70" data-pts="70" data-debug="70 pts: ARA Salta Submarine"
                 data-intel="[INTEL GAP: Subsurface Acoustic Anomaly]">70 pts: ARA Salta Submarine</div>
             <div class="threat-pill" id="pill-75" data-pts="75" data-debug="75 pts: ARA San Luis Submarine"
@@ -2101,7 +2122,7 @@ CTFS.HTML_TEMPLATE = [==[
             <div class="threat-pill" id="pill-95" data-pts="95" data-debug="95 pts: RBS 70 NG MANPADS"
                 data-intel="[CLASSIFIED: Port Point Defense Hardened]">95 pts: RBS 70 NG MANPADS</div>
             <div class="threat-pill" id="pill-99" data-pts="99" data-debug="99 pts: ARG Side -> Ace"
-                data-intel="[THEATER READINESS: Maximum War Footing (Ace)]">99 pts: ARG Side -> Ace</div>
+                data-intel="[THEATER READINESS: Maximum War Footing]">99 pts: ARG Side -> Ace</div>
         </div>
     </div>
 
@@ -2754,6 +2775,7 @@ CTFS.HTML_TEMPLATE = [==[
 
             // Synchronize final hidden inputs
             document.getElementById('ctfs_payload').value = encodedPayload;
+            document.getElementById('ctfs_launched').value = "true";
             document.getElementById('ctfs_points').value = payload.totalPoints.toString();
             document.getElementById('ctfs_hours').value = (payload.totalPoints * HOURS_PER_POINT).toString();
 
@@ -2894,8 +2916,8 @@ CTFS.HTML_TEMPLATE = [==[
                             <div style="color: #ffffff; font-size: 15px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">
                                 ORDERS TRANSMITTED - TASK FORCE DEPLOYED
                             </div>
-                            <div style="color: #a7f3d0; font-size: 12px; margin-top: 4px; font-weight: 600;">
-                                You can safely close this window
+                            <div style="color: #a7f3d0; font-size: 13px; margin-top: 6px; font-weight: 600;">
+                                You can close this window
                             </div>
                         </div>
 
@@ -2994,7 +3016,23 @@ function CTFS.OpenDialog()
     local return_table = UI_CallAdvancedHTMLDialog("CTFS: Carrier Task Force Selector", htmlPayload,
         { "Launch Operation Recorporate", "Cancel" })
 
-    if return_table and (return_table["pressed"] == "Launch Operation Recorporate" or return_table["pressed"] == "Launch Task Force") then
+    local isLaunchConfirmed = false
+    if return_table then
+        local pressed = return_table["pressed"] or ""
+        local launched = return_table["ctfs_launched"] or ""
+        pressed = string.gsub(pressed, "^'", ""):gsub("'$", "")
+        launched = string.gsub(launched, "^'", ""):gsub("'$", "")
+
+        if pressed == "Launch Operation Recorporate" or pressed == "Launch Task Force" or pressed == "Deploy" or pressed == "Done" or pressed == "OK" then
+            isLaunchConfirmed = true
+        elseif launched == "true" or launched == "1" then
+            isLaunchConfirmed = true
+        elseif return_table["ctfs_payload"] and return_table["ctfs_payload"] ~= "" and pressed ~= "Cancel" then
+            isLaunchConfirmed = true
+        end
+    end
+
+    if isLaunchConfirmed then
         -- Coerce and extract payload from hidden inputs
         local rawPayload = return_table["ctfs_payload"]
         if rawPayload and #rawPayload > 0 then
@@ -3057,5 +3095,6 @@ function CTFS_ProcessUIResponse(jsonString)
         ScenEdit_MsgBox("CTFS Core Error: Failed to parse user selection payload.", 1)
     end
 end
+_G.CTFS_ProcessUIResponse = CTFS_ProcessUIResponse
 
 return CTFS
