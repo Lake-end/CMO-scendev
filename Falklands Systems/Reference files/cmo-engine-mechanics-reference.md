@@ -881,3 +881,121 @@ CMO scenarios (`.scen`) are XML documents that store Lua event actions as embedd
    ```
 3. **Save Scenario:** Save `Falklands 27.scen`. The scenario is now 100% self-contained, zero-dependency, and ready for public distribution.
 
+---
+
+## 21. CMO Weather Engine Architecture & Multi-Zone Simulation
+
+### 21.1 Core Engine Weather Modeling
+Internal inspection of `Command.exe` (.NET assembly `Command_Core`) reveals how weather physics operate inside the simulation kernel:
+- **`Command_Core.Weather+WeatherProfile`**: Internal data structure holding meteorological state:
+  - `AverageTemp` (Double), `DayNightTempModifier` (Int32), `Pressure` (Double), `RelativeHumidity` (Double)
+  - `SeaState` (Int32), `RainfallRate` (Single), `FractionUnderRain` (Single)
+  - `CloudInfo` (`TCloudInfo`), `ContrailAltitude` (Int32)
+  - `SurfaceVisibilityKM` (Single), `RunwayVisualRangeNM` (Double)
+  - `DELTA_N` (Double), `SurfaceRefractivity` (Double), `SurfaceDuctHeight` (Double), `EvaporationDuctHeight` (Double)
+- **`Command_Core.Scenario.GlobalWeather`**: The active simulation scenario maintains a **single global weather profile** across the entire map.
+- **`ScenEdit_SetWeather(temp, rainfall, undercloud, seastate)`**: Updates `Scenario.GlobalWeather`, which immediately affects sensor physics globally (infrared / FLIR atmospheric attenuation, radar rain scatter, sonar ambient wave noise, and surface visibility).
+
+### 21.2 Overcoming Global Weather Limitations: The Hybrid Multi-Zone Architecture
+Because the native simulation engine only supports one global `WeatherProfile`, attempting to model multi-theater operations (e.g. European winter, Atlantic transit, and Sub-Antarctic gales) natively across the map causes sensor physics conflicts.
+
+The **Dynamic Weather Engine (DWE)** resolves this through an asynchronous hybrid design:
+1. **Physical Engine Synchronization:** The global `ScenEdit_SetWeather()` is dynamically synchronized to whichever operational zone contains the player's primary combat focus (e.g. the Falklands AO or the current flagship location), ensuring all high-stakes tactical engagements experience authentic sensor attenuation and sea states.
+2. **Local Zone Evaluation via Lua:** Units located in other worldwide zones are evaluated against their local zone's climate parameters. Flight operations, deck pitching limits, and sea-keeping speed caps are enforced directly on units located within those specific zones.
+
+### 21.3 State-Preserving Aircraft Grounding vs. Naive Re-Arm Delay
+In legacy CMO scripts, scenario authors grounded aircraft during storms by calling `ScenEdit_SetUnit({ guid = ac.guid, timetoready_minutes = 1440 })`. 
+This creates severe gameplay defects:
+- It overwrites active re-arming countdowns (e.g. an aircraft 15 minutes away from finishing a 4-hour turnaround is reset to 24 hours).
+- When a storm ends prematurely, aircraft remain locked down for the remainder of the 1440 minutes.
+
+**The State-Preserving Solution:**
+1. When local Sea State &ge; 6 (manned) or &ge; 8 (UAV):
+   - Set `timetoready_minutes = tickIntervalHours * 60` (e.g., 360 min).
+   - Set persistent flag: `ScenEdit_SetKeyValue("DWE_HELD_AC_" .. ac.guid, "true")`.
+2. When local Sea State drops back below the operational limit:
+   - Check if `ScenEdit_GetKeyValue("DWE_HELD_AC_" .. ac.guid) == "true"`.
+   - If true, call `ScenEdit_SetUnit({ guid = ac.guid, timetoready_minutes = 0 })` and clear the key. Ready aircraft become immediately available for launch the moment the storm abates.
+
+### 21.4 Aircraft Turnaround & Readiness: Setter vs. Getter Asymmetry
+A common Lua API trap in CMO is the asymmetry between *setting* and *reading* aircraft turnaround times:
+- **Setting Ready Time:** Pass parameter `timetoready_minutes = <int>` to `ScenEdit_SetUnit({ guid = ac.guid, timetoready_minutes = 60 })`.
+- **Reading Ready Time:** **`ac.timetoready` does NOT exist!** The actual property on `LuaWrapper_ActiveUnit` is **`ac.readytime`** (and companion status properties `ac.condition`, `ac.condition_v`, and `ac.unitstate`).
+- Querying `ac.timetoready` always yields `nil`, causing code like `if ac.timetoready == 0` to fail silently or crash.
+
+**Canonical Lua Pattern for Checking Aircraft Readiness:**
+```lua
+-- An aircraft is on deck and ready to launch if readytime is 0 or condition is "Ready"
+local isReady = (ac.readytime == 0 or ac.readytime == "0" or ac.readytime == "00:00:00" or ac.readytime == nil or ac.condition == "Ready")
+```
+
+---
+
+## 22. Zone & Polygon Membership Testing: `ScenEdit_IsUnitInZone` vs. `Side:unitsInArea`
+
+### 22.1 The `ScenEdit_IsUnitInZone` API Trap
+In the engine internal assembly (`Command_Core.Lua.PrivateMethods`), the method signature is:
+```csharp
+public static bool ScenEdit_IsUnitInZone(string TheUnit_NameOrID, string TheZone_NameOrID, string Side_NameOrID, Scenario ScenarioContext)
+```
+- **Constraint:** `TheZone_NameOrID` requires the name or GUID of a pre-existing Named Scenario Zone (created via `ScenEdit_AddZone`), **NOT a Lua table array of Reference Point names**.
+- Passing `{ guid = unit.guid, zone = rpList }` fails or throws `undefined global` errors depending on sandbox wrapper bindings.
+
+### 22.2 The Two Reliable Methods for Regional Testing
+1. **Latitude/Longitude Bounding Box (Fastest & Zero-Dependency):**
+   ```lua
+   if lat >= zone.latMin and lat <= zone.latMax and lon >= zone.lonMin and lon <= zone.lonMax then
+       return zone
+   end
+   ```
+   Requires no scenario reference points, executes in nanoseconds, and is 100% immune to missing RP errors.
+2. **Canonical Reference Point Polygon (`Side:unitsInArea`):**
+   ```lua
+   local side = VP_GetSide({ side = sideName })
+   if side and side.unitsInArea then
+       local unitsInArea = side:unitsInArea({ Area = { "RP_1", "RP_2", "RP_3", "RP_4" } })
+       for _, u in ipairs(unitsInArea) do
+           if u.guid == unit.guid then return true end
+       end
+   end
+   ```
+
+---
+
+## 23. Complete Reverse-Engineered Property Schema: `LuaWrapper_ActiveUnit`
+
+Extracted via runtime reflection from `Command_Core.Lua.LuaWrapper_ActiveUnit` in `Command.exe`:
+
+| Property Name | Return Type | Category | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| `name` | `String` | Identity | Unit display name |
+| `guid` | `String` | Identity | Unique identifier string |
+| `side` | `String` | Identity | Owning side name |
+| `type` | `String` | Classification | Unit category (`"Ship"`, `"Aircraft"`, `"Submarine"`, `"Facility"`) |
+| `subtype` / `category` | `String` | Classification | Specific sub-role (e.g. `"Guided Missile Destroyer"`) |
+| `classname` | `String` | Classification | Full database class name (e.g. `"Type 45 Daring [Batch 2]"`) |
+| `dbid` | `Int32` | Database | Database entity ID |
+| `latitude` / `longitude` | `Double` | Position | Current world coordinates |
+| `altitude` / `manualAltitude`| `Object` | Position | Current altitude/depth (meters) |
+| `heading` / `desiredHeading` | `Object` | Kinematics | Current and commanded compass heading (degrees) |
+| `speed` / `manualSpeed` | `Object` | Kinematics | Current and commanded speed (knots) |
+| `throttle` | `Object` | Kinematics | Engine throttle state (`"Cruise"`, `"Full"`, `"Flank"`, etc.) |
+| `readytime` | `Object` | Aviation | **Readiness turnaround clock.** (Do NOT use `timetoready`!) |
+| `condition` / `condition_v` | `String` | Status | Operational condition (`"Ready"`, `"Readying"`, `"Maintenance"`) |
+| `unitstate` | `String` | Status | Simulation state (`"Unassigned"`, `"InFlight"`, `"Disembarking"`) |
+| `airbornetime` / `_v` | `Object` | Aviation | Time unit has spent in the air |
+| `timeunderway` / `_v` | `Object` | Maritime | Time vessel has spent under way |
+| `loadoutdbid` / `loadout` | `Object` | Munitions | Active loadout database ID and loadout object |
+| `damage` | `LuaTable` | Vitality | Current DP and component damage structure |
+| `outOfComms` | `Boolean` | C4I | True if unit is cut off from side communications |
+| `jammed` / `jammer` | `Boolean` | EW | Electronic warfare active jamming flags |
+| `currentExhaustion` | `Single` | Crew | Current crew fatigue level (0.0 to 1.0) |
+| `maxExhaustion` | `Single` | Crew | Maximum exhaustion threshold |
+| `assignedUnits` | `LuaTable` | Hierarchy | Subordinate units (e.g. `assignedUnits.Aircraft`, `assignedUnits.Boats`) |
+| `group` | `Object` | Hierarchy | Parent formation/task group wrapper |
+| `base` / `hostFacility` | `Wrapper` | Basing | Home airfield or hosting mothership facility |
+| `dockFacilities` / `airFacilities` | `LuaTable` | Facilities | Internal flight deck / landing pad / dock components |
+| `TF` / `TFType` | `Boolean` / `Int32` | Formation | Task Force flags |
+| `noiseLevel` / `signature` | `LuaTable` | Signatures | Radar cross-section and acoustic sonar signatures |
+
+

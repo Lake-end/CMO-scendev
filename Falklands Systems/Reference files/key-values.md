@@ -148,7 +148,25 @@ Lightweight tracking variables used by standalone scripts in `Global/`.
 
 ---
 
-## 9. Master Index & Cross-Reference Table
+## 9. DWE: Dynamic Weather Engine Tracking & State
+
+Maintains persistent meteorological state, storm lifecycle, and temporary flight deck holds across scenario saves/loads.
+
+| Key | Type / Format | Default | Description & Usage |
+| :--- | :--- | :--- | :--- |
+| `DWE_INITIALIZED` | `"true"` | `"true"` | Set by `weather-engine.lua` on first run. Signals that baseline weather states have been seeded. |
+| `DWE_TICK_COUNT` | Integer string (e.g. `"4"`) | `"0"` | Incremented on each weather engine execution cycle (e.g. every 6 or 12 hours). |
+| `DWE_Z_<ID>_TEMP` | Integer string (e.g. `"6"`) | Varies | Persistent ambient temperature in °C for zone `<ID>` or `"global"`. |
+| `DWE_Z_<ID>_RAIN` | Integer string (e.g. `"15"`) | Varies | Persistent precipitation rate in mm/hr for zone `<ID>` or `"global"`. |
+| `DWE_Z_<ID>_CLOUDS` | Float string (e.g. `"0.8"`) | Varies | Persistent cloud fraction (0.0 to 1.0) for zone `<ID>` or `"global"`. |
+| `DWE_Z_<ID>_SEASTATE` | Integer string (0–9) | Varies | Persistent sea state (WMO / Beaufort scale) for zone `<ID>` or `"global"`. |
+| `DWE_Z_<ID>_STORM_REMAINING`| Integer string (e.g. `"2"`) | `"0"` | Remaining execution ticks for an active storm front in zone `<ID>`. |
+| `DWE_Z_<ID>_IN_STORM` | `"true"` \| `"false"` | `"false"` | Indicates whether zone `<ID>` is currently experiencing an active storm front. |
+| `DWE_HELD_AC_<GUID>` | `"true"` \| `""` | `""` | Set to `"true"` on aircraft grounded strictly due to sea state (SS $\ge$ 6/8). When seas calm, DWE detects this flag and instantly restores `timetoready_minutes = 0`. |
+
+---
+
+## 10. Master Index & Cross-Reference Table
 
 | Key Name | Subsystem | Value Format | Default Value | Mutated By |
 | :--- | :--- | :--- | :--- | :--- |
