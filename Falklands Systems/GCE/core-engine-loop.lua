@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 3: CORE ENGINE LOOP (SELF-CONTAINED)
+-- SCRIPT 3: CORE ENGINE LOOP (SELF-CONTAINED) v3
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -34,12 +34,23 @@ local GCE_Zones = {
     "ZONE_PLEASANT"
 }
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_RunEngineCycle()
     local shiftRateMultiplier = 1.5
     local ukSide = VP_GetSide({ side = "UK" })
     if ukSide == nil then return end
 
-    local allUK_RPs = ScenEdit_GetReferencePoints({ side = "UK" })
+    local allUK_RPs = ukSide.rps or {}
+    local devMode = IsDevMode()
+    local zoneTelemetry = {}
+    local isrUnitName = nil
 
     -- =========================================================
     -- 1. GLOBAL ISR CHECK (ZONE_FALKLANDS_ISR)
@@ -63,6 +74,7 @@ function GCE_RunEngineCycle()
                     -- Check for AEW, MPA, or Drones
                     if unit.subtype == 'Airborne_Early_Warning' or unit.subtype == 'Maritime_PatrolAircraft' or unit.subtype == 'UAV' then
                         globalSA = 1.25 -- +25% Global Combat Efficiency
+                        isrUnitName = unit.name
                         break
                     end
                 end
@@ -161,35 +173,35 @@ function GCE_RunEngineCycle()
             ScenEdit_SetKeyValue("ZCTRL_" .. zoneName .. "_SECURED", "TRUE")
 
             -- BASE HANDOVER LOGIC (Dynamic Area-of-Effect & Hosted Units)
-            local enemySideName = "Argentina" 
-            local enemySide = VP_GetSide({side=enemySideName})
-            
+            local enemySideName = "Argentina"
+            local enemySide = VP_GetSide({ side = enemySideName })
+
             if enemySide ~= nil and #zonePolygon >= 3 then
-                local enemyUnits = enemySide:unitsInArea({Area=zonePolygon})
+                local enemyUnits = enemySide:unitsInArea({ Area = zonePolygon })
                 if enemyUnits ~= nil then
                     for _, u in ipairs(enemyUnits) do
-                        local unit = ScenEdit_GetUnit({guid=u.guid})
-                        
+                        local unit = ScenEdit_GetUnit({ guid = u.guid })
+
                         -- Target Ground Facilities (Airbases, Ports, Ammo Dumps)
                         if unit ~= nil and unit.type == 'Facility' then
                             -- 1. Flip the parent facility
-                            ScenEdit_SetUnitSide({side=unit.side, guid=unit.guid, newside="UK"})
-                            
+                            ScenEdit_SetUnitSide({ side = unit.side, guid = unit.guid, newside = "UK" })
+
                             -- 2. Flip embarked units (Aircraft and Boats)
                             if unit.embarkedUnits ~= nil then
                                 -- Handle Aircraft
                                 if unit.embarkedUnits.Aircraft ~= nil then
                                     for i = 1, #unit.embarkedUnits.Aircraft do
                                         local childGuid = unit.embarkedUnits.Aircraft[i]
-                                        ScenEdit_SetUnitSide({side=unit.side, guid=childGuid, newside="UK"})
+                                        ScenEdit_SetUnitSide({ side = unit.side, guid = childGuid, newside = "UK" })
                                     end
                                 end
-                                
+
                                 -- Handle Boats
                                 if unit.embarkedUnits.Boats ~= nil then
                                     for i = 1, #unit.embarkedUnits.Boats do
                                         local childGuid = unit.embarkedUnits.Boats[i]
-                                        ScenEdit_SetUnitSide({side=unit.side, guid=childGuid, newside="UK"})
+                                        ScenEdit_SetUnitSide({ side = unit.side, guid = childGuid, newside = "UK" })
                                     end
                                 end
                             end
@@ -212,7 +224,9 @@ function GCE_RunEngineCycle()
             ScenEdit_SetKeyValue("GCE_GLOBAL_UK_MORALE", newUkMorale)
             ScenEdit_SetKeyValue("GCE_GLOBAL_ARG_MORALE", newArgMorale)
 
-            local msg = string.format("<b>STRATEGIC VICTORY</b><br>%s has been secured by UK Forces! Global Morale increases by %d%%.<br><br><i>All surviving enemy facilities and their embarked assets in the sector have been captured.</i>", zoneName, moraleBoost)
+            local msg = string.format(
+            "<b>STRATEGIC VICTORY</b><br>%s has been secured by UK Forces! Global Morale increases by %d%%.<br><br><i>All surviving enemy facilities and their embarked assets in the sector have been captured.</i>",
+                zoneName, moraleBoost)
             ScenEdit_SpecialMessage("UK", msg)
         end
 
@@ -245,6 +259,29 @@ function GCE_RunEngineCycle()
                 end
             end
         end
+
+        if devMode then
+            table.insert(zoneTelemetry, {
+                name        = zoneName,
+                oldCtrl     = math.floor(ctrlPct - shift),
+                newCtrl     = math.floor(ctrlPct),
+                shift       = shift,
+                ukBase      = ukPwr,
+                argBase     = argPwr,
+                globalSA    = globalSA,
+                casMod      = casMod,
+                ngfsMod     = ngfsMod,
+                morale      = morale,
+                ukEffective = ukEffective,
+                argEffective= argEffective,
+                delta       = powerDelta,
+                supplied    = isSuppliedNow,
+                supplyTimer = supplyTimer,
+                mods        = modsString,
+                status      = statusStr,
+                unitsCount  = (unitsInZone and #unitsInZone or 0)
+            })
+        end
     end -- <-- THIS IS THE END OF YOUR ZONE PROCESSING LOOP
 
     -- ==============================================================================
@@ -252,15 +289,51 @@ function GCE_RunEngineCycle()
     -- ==============================================================================
     local stanleySecured = ScenEdit_GetKeyValue("ZCTRL_ZONE_STANLEY_SECURED") or "FALSE"
     local pleasantSecured = ScenEdit_GetKeyValue("ZCTRL_ZONE_PLEASANT_SECURED") or "FALSE"
-    
-    if stanleySecured == "TRUE" and pleasantSecured == "TRUE" then
-        local totalSecured = 0
-        for _, zone in ipairs(GCE_Zones) do
-            if (ScenEdit_GetKeyValue("ZCTRL_" .. zone .. "_SECURED") or "FALSE") == "TRUE" then
-                totalSecured = totalSecured + 1
-            end
+    local totalSecured = 0
+
+    for _, zone in ipairs(GCE_Zones) do
+        if (ScenEdit_GetKeyValue("ZCTRL_" .. zone .. "_SECURED") or "FALSE") == "TRUE" then
+            totalSecured = totalSecured + 1
         end
-        
+    end
+
+    -- ==============================================================================
+    -- 7. DEVELOPER MODE VERBOSE TELEMETRY DUMP
+    -- ==============================================================================
+    if devMode then
+        local ukMorale = ScenEdit_GetKeyValue("GCE_GLOBAL_UK_MORALE") or "100"
+        local argMorale = ScenEdit_GetKeyValue("GCE_GLOBAL_ARG_MORALE") or "100"
+        local ukSupply = ScenEdit_GetKeyValue("GCE_GLOBAL_UK_SUPPLY") or "100"
+        local ukLosses = ScenEdit_GetKeyValue("GCE_LOSS_SCORE_UK") or "0"
+
+        print("=========================================================================================")
+        print(" [GCE DEV TELEMETRY] --- Tactical Ground War Diagnostics ---")
+        print("=========================================================================================")
+        print(string.format("  GLOBAL METRICS: UK Morale: %s%% | ARG Morale: %s%% | UK Supply: %s%% | UK Losses: %s / 250",
+            ukMorale, argMorale, ukSupply, ukLosses))
+        print(string.format("  GLOBAL ISR (ZONE_FALKLANDS_ISR): Multiplier x%.2f (Active Aircraft: %s)",
+            globalSA, isrUnitName or "None"))
+        print("-----------------------------------------------------------------------------------------")
+        print(string.format("  %-20s | %-12s | %-14s | %-16s | %-12s",
+            "ZONE NAME", "CONTROL", "BASE PWR (U/A)", "EFF PWR (U/A)", "STATUS & MODS"))
+        print("-----------------------------------------------------------------------------------------")
+        for _, z in ipairs(zoneTelemetry) do
+            local ctrlShiftStr = string.format("%d%% (%+d%%)", z.newCtrl, math.floor(z.shift))
+            local basePwrStr = string.format("%d / %d", z.ukBase, z.argBase)
+            local effPwrStr = string.format("%.1f / %.1f", z.ukEffective, z.argEffective)
+            local modStr = z.mods ~= "" and (" [" .. z.mods .. "]") or ""
+            print(string.format("  %-20s | %-12s | %-14s | %-16s | %s%s",
+                z.name:gsub("ZONE_", ""), ctrlShiftStr, basePwrStr, effPwrStr, z.status, modStr))
+            print(string.format("    -> Modifiers: ISR(x%.2f) CAS(x%.2f) NGFS(x%.2f) Morale(x%.2f) | SupplyTether: %dh | UnitsInArea: %d",
+                z.globalSA, z.casMod, z.ngfsMod, z.morale, z.supplyTimer, z.unitsCount))
+        end
+        print("-----------------------------------------------------------------------------------------")
+        print(string.format("  STRATEGIC VICTORY PROGRESS: %d / 11 Zones Secured | Stanley: %s | Pleasant: %s (Threshold: 8)",
+            totalSecured, stanleySecured, pleasantSecured))
+        print("=========================================================================================")
+    end
+
+    if stanleySecured == "TRUE" and pleasantSecured == "TRUE" then
         -- Win condition: Stanley + Pleasant + at least 6 other zones (8/11 total)
         if totalSecured >= 8 then
             local msg = string.format([[
@@ -271,7 +344,7 @@ function GCE_RunEngineCycle()
                     <h3>OUTSTANDING STRATEGIC VICTORY</h3>
                 </body>
             ]], totalSecured)
-            
+
             ScenEdit_SpecialMessage("UK", msg)
             ScenEdit_EndScenario()
         end

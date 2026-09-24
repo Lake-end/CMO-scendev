@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 2: CONSUMPTION INFILTRATION SCRIPT (SELF-CONTAINED)
+-- SCRIPT 2: CONSUMPTION INFILTRATION SCRIPT (SELF-CONTAINED) v3
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -70,26 +70,39 @@ local GCE_UnitPowerMapping = {
     ["Exocet Coastal Battery"]        = 150
 }
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_ConsumeForces()
     local logMessages = {}
+    local devMode = IsDevMode()
     local ukSide = VP_GetSide({ side = "UK" })
 
     -- GUARD CLAUSE: Safely abort if the UK side doesn't exist
     if ukSide == nil then
-        ScenEdit_Print("GCE Error: Side 'UK' not found. Cannot run consumption.")
+        print("GCE Error: Side 'UK' not found. Cannot run consumption.")
         return
     end
 
+    local allUK_RPs = ukSide.rps or {}
+    local totalUnitsInfiltrated = 0
+
+    if devMode then
+        print("[GCE CONSUMPTION DEBUG] --- Beginning Ground Infiltration Scan across 11 Zones ---")
+    end
+
     for _, zoneName in ipairs(GCE_Zones) do
-        local rps = ScenEdit_GetReferencePoints({ side = "UK" })
         local zonePolygon = {}
 
         -- Safely check if rps exists before attempting to iterate over it
-        if rps ~= nil then
-            for _, rp in ipairs(rps) do
-                if string.find(rp.name, zoneName) and not string.find(rp.name, "%[CTRL") then
-                    table.insert(zonePolygon, rp.name)
-                end
+        for _, rp in ipairs(allUK_RPs) do
+            if string.find(rp.name, zoneName) and not string.find(rp.name, "%[CTRL") then
+                table.insert(zonePolygon, rp.name)
             end
         end
 
@@ -111,7 +124,13 @@ function GCE_ConsumeForces()
                                 ScenEdit_SetKeyValue("ZCTRL_" .. zoneName .. "_UK_PWR", currentPower + pointValue)
 
                                 zonePointsAdded = zonePointsAdded + pointValue
+                                totalUnitsInfiltrated = totalUnitsInfiltrated + 1
                                 table.insert(unitsConsumedList, unit.name)
+
+                                if devMode then
+                                    print(string.format("  [+] INFILTRATED: %s | Zone: %s | Value: +%d PWR | New Total: %d PWR (Unit Deleted from Map)",
+                                        unit.name, zoneName, pointValue, currentPower + pointValue))
+                                end
 
                                 ScenEdit_DeleteUnit({ guid = unit.guid })
                                 break
@@ -128,6 +147,10 @@ function GCE_ConsumeForces()
                 end
             end
         end
+    end
+
+    if devMode then
+        print(string.format("[GCE CONSUMPTION DEBUG] Scan completed. Infiltrated %d units into tactical reserves.", totalUnitsInfiltrated))
     end
 
     if #logMessages > 0 then

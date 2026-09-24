@@ -24,8 +24,8 @@
 * 2x Mojave UAV
 
 ### 1.2 RFA Support 
-* RFA Lyme Bay
-* RFA Tideforce
+* RFA Lyme Bay (Amphibious Assault Group, spawned at FLEET_SPAWN2)
+* RFA Tideforce (Standing Task Force / CSG, spawned at FLEET_SPAWN1)
 #### 1.2.1 RFA Helicopters and UAVs
 * Lyme Bay (1x Chinook, 4x RQ-20B Puma UAV)
 * Tideforce (1x Wildcat HMA.2, 2x Malloy T150 UAV)
@@ -37,7 +37,7 @@
 * 2x P-8 Poseidon MRA.1
 * 4x Airbus Voyager
 * 4x C-17A Globemaster III
-* 10x A400M Atlas C.1 (limit 10) 1pts
+* 10x A400M Atlas C.1
 * 1x Protector RG1
 
 

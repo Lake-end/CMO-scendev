@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 5: ARGENTINE AI DIRECTOR
+-- SCRIPT 5: ARGENTINE AI DIRECTOR v2
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -14,14 +14,27 @@
 -- 2. Action: Lua Script Action (paste this entire block).
 -- ==============================================================================
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_ARG_AI_Director()
-    
+    local devMode = IsDevMode()
+
     -- 1. Mainland Reinforcements (Simulating C-130 flights to West Falkland)
     local westernZones = {"ZONE_PORT_HOWARD", "ZONE_FOX_BAY", "ZONE_PEBBLE_ISLAND"}
     for _, zone in ipairs(westernZones) do
         local current = tonumber(ScenEdit_GetKeyValue("ZCTRL_" .. zone .. "_ARG_PWR")) or 0
         -- Adds 20 points (equiv to 1 platoon) per cycle
-        ScenEdit_SetKeyValue("ZCTRL_" .. zone .. "_ARG_PWR", current + 20) 
+        ScenEdit_SetKeyValue("ZCTRL_" .. zone .. "_ARG_PWR", current + 20)
+        if devMode then
+            print(string.format("[GCE AI Director] Mainland Air-Bridge: Reinforcing %s (+20 ARG PWR -> Total: %d)",
+                zone, current + 20))
+        end
     end
     
     -- 2. Stanley Reserve Deployment
@@ -47,8 +60,11 @@ function GCE_ARG_AI_Director()
                     
                     stanleyReserve = stanleyReserve - 30
                     ScenEdit_SetKeyValue("ZCTRL_ZONE_STANLEY_ARG_PWR", stanleyReserve)
-                    
-                    -- ScenEdit_Print("AI Director: Diverted 30 points from Stanley to " .. front)
+
+                    if devMode then
+                        print(string.format("[GCE AI Director] Strategic Defense Shift: Diverted 30 ARG PWR from Stanley to contested %s (Stanley Reserve remaining: %d)",
+                            front, stanleyReserve))
+                    end
                 end
             end
         end

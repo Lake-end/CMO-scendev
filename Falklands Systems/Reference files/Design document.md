@@ -122,3 +122,18 @@ The scenario must support sustained operations over several days or weeks.
 *   **Briefings:** Comprehensive HTML briefings for the UK player detailing the political stakes (Loss Score threshold), the mechanics of the GCE, and RoE (Rules of Engagement).
 *   **Environment:** Set in late Autumn (simulating the brutal South Atlantic weather). High sea states, heavy cloud cover, and frequent squalls to complicate ISR and CAS operations.
 *   **Scoring & Evaluation:** Beyond the hard fail state, standard CMO scoring will be awarded for destroying Argentine high-value targets (Command bunkers, SSKs, strike aircraft) to evaluate player efficiency.
+
+---
+
+## 7. COMPLETED SYSTEM: GLOBAL DEVELOPER MODE & TELEMETRY SUITE
+To accelerate balancing and verification without leaking classified mechanics or cluttering player logs upon release, all scenario subsystems are tied to a single Global Developer Mode key:
+*   **Key-Value Flag:** `FALKL_DEV_MODE` (Boolean string: `"true"` or `"false"`).
+*   **Default State:** Set to `"true"` automatically on initialization. Set to `"false"` manually for release.
+
+### 7.1 Cross-System Integrations
+*   **CTFS (Carrier Task Force Selector):** Dynamically toggles `CTFS.DEBUG_MODE`. When active, reveals exact hour calculations, point budgets, and un-redacts the complete Argentine escalation matrix.
+*   **GCE (Ground Control Engine):** Emits an exhaustive tabular diagnostics report to the console every hour tick: all 11 zones, base power, multipliers (CAS, NGFS, ISR, Morale, Tether), effective power deltas, shift percentages, unit counts, and strategic victory progress.
+*   **GCE Consumption:** Logs unit-by-unit infiltration events with matched power points and physical map deletions.
+*   **GCE AI Director:** Logs mainland reinforcement flights to West Falkland and strategic power diversions from Stanley.
+*   **Generic UK Loss Tracker:** Logs casualty category, penalty points assessed, and threshold progress percentage.
+*   **REE (Random Event Engine):** Exposes candidate pool analytics and unlocks the hourly sequential test runner (`REE_DEV_FORCE_EVENT_HOURLY` and `REE_DEV_FORCE_SEQUENTIAL`), managed via `ree-test-runner.lua`.

@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 4: HTML SITREP BRIEFING GENERATOR
+-- SCRIPT 4: HTML SITREP BRIEFING GENERATOR v2
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -29,12 +29,27 @@ local GCE_Zones = {
     "ZONE_PLEASANT"
 }
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_GenerateSITREP()
+    local devMode = IsDevMode()
+
     -- 1. Fetch Global Variables
     local ukMorale = ScenEdit_GetKeyValue("GCE_GLOBAL_UK_MORALE") or "100"
     local argMorale = ScenEdit_GetKeyValue("GCE_GLOBAL_ARG_MORALE") or "100"
     local ukSupply = ScenEdit_GetKeyValue("GCE_GLOBAL_UK_SUPPLY") or "100"
     local ukLosses = ScenEdit_GetKeyValue("GCE_LOSS_SCORE_UK") or "0"
+
+    if devMode then
+        print(string.format("[GCE SITREP DEBUG] Compiling Strategic SITREP: UK Morale: %s%%, ARG Morale: %s%%, UK Supply: %s%%, UK Losses: %s pts",
+            ukMorale, argMorale, ukSupply, ukLosses))
+    end
 
     -- 2. Construct HTML Header & Global Status Panel
     local html = [[

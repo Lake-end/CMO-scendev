@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- FALKLANDS 2027: ABSTRACTED GROUND CONTROL ENGINE (GCE)
--- SCRIPT 5: ARG AI COUNTER-OFFENSIVE DIRECTOR (PHYSICAL SPAWNS)
+-- SCRIPT 5: ARG AI COUNTER-OFFENSIVE DIRECTOR (PHYSICAL SPAWNS) v2
 -- ==============================================================================
 
 local GCE_Zones        = {
@@ -29,11 +29,26 @@ local DBID_ARG_SSM     = 3913 -- e.g., Exocet Coastal Battery
 local DBID_ARG_STRIKE  = 73   -- e.g., A-4AR Fightinghawk or Su-24
 local DBID_ARG_LOADOUT = 390  -- e.g., Iron Bombs or Stand-off Munitions
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_ARG_CounterAttack()
     math.randomseed(ScenEdit_CurrentTime())
+    local devMode = IsDevMode()
 
+    local roll = math.random(1, 100)
     -- 25% chance to launch a counter-attack every time this script runs
-    if math.random(1, 100) > 25 then return end
+    if roll > 25 then
+        if devMode then
+            print(string.format("[GCE Counter-Attack DEBUG] Evaluated: Roll was %d/100 (Threshold <= 25). No assault launched this cycle.", roll))
+        end
+        return
+    end
 
     local eligibleTargets = {}
 
@@ -61,9 +76,15 @@ function GCE_ARG_CounterAttack()
             ScenEdit_SetKeyValue("ZCTRL_" .. targetZone .. "_SECURED", "FALSE")
         end
 
+        if devMode then
+            print(string.format("[GCE Counter-Attack DEBUG] >>> LAUNCHING COUNTER-OFFENSIVE AT %s! Injected +150 ARG PWR (New Total: %d). UK Control shifted from %d%% to %d%%.",
+                targetZone, currentArgPwr + 150, currentUkCtrl, math.floor(newUkCtrl)))
+        end
+
         -- 2. PHYSICAL SPAWNS (The Tactical Threat)
         local ukSide = VP_GetSide({ side = "UK" })
-        local allUK_RPs = ScenEdit_GetReferencePoints({ side = "UK" })
+        if ukSide == nil then return end
+        local allUK_RPs = ukSide.rps or {}
         local zonePolygon = {}
         local latSum, lonSum, rpCount = 0, 0, 0
 

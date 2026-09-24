@@ -1,5 +1,5 @@
-﻿-- =============================================================================
--- CTFS (Carrier Task Force Selector) - Master Backend Engine (Falklands 2027)
+-- =============================================================================
+-- CTFS (Carrier Task Force Selector) - Master Backend Engine (Falklands 2027) v2
 -- =============================================================================
 -- ARCHITECTURE:
 -- Implements the Command: Modern Operations (CMO) HTML UI Reference Architecture:
@@ -16,7 +16,18 @@
 CTFS = CTFS or {}
 CTFS.MaxPoints = 100
 CTFS.HoursPerPoint = 5
-CTFS.DEBUG_MODE = true -- Set to false for release (hides points budget & redacts threat matrix)
+
+-- Developer Mode check (respects FALKL_DEV_MODE in CMO Key-Value Store)
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true -- Defaults to true during development
+end
+
+CTFS.IsDevMode = IsDevMode
+CTFS.DEBUG_MODE = IsDevMode() -- Automatically tied to FALKL_DEV_MODE
 
 -- =============================================================================
 -- EMBEDDED ZERO-DEPENDENCY PURE LUA JSON ENGINE
@@ -201,7 +212,7 @@ CTFS.MODEL = {
         { id = "QE", type = "Ship", dbid = 1008, name = "HMS Queen Elizabeth", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Carrier Strike Group (CSG) Flagship", upgradeCost = 4 },
         { id = "StAlbans", type = "Ship", dbid = 3199, name = "HMS St Albans", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost = 2 },
         { id = "Daring", type = "Ship", dbid = 3200, name = "HMS Daring", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost = 2 },
-        { id = "LymeBay", type = "Ship", dbid = 1451, name = "RFA Lyme Bay", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+        { id = "LymeBay", type = "Ship", dbid = 1451, name = "RFA Lyme Bay", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN2", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
         { id = "Tideforce", type = "Ship", dbid = 2581, name = "RFA Tideforce", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_SPAWN1", category = "default", group = "Task Force Warships & Surface Auxiliaries", role = "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
         { id = "Medway", type = "Ship", dbid = 2805, name = "HMS Medway", isDefault = true, pts = 0, qty = 1, spawnRP = "FLEET_FALKLANDS", category = "default", group = "Falklands Forward Patrol Asset", role = "River-class Batch 2 OPV (Falklands Forward Patrol) — Embarked: 2x Peregrine UAV" },
 
@@ -558,7 +569,7 @@ local function ReadLocalFile(filename, debugLog)
         return nil, debugLog
     end
 
-    local scenFolder = rawget(_G, "_scenariofolder_") or ""
+    local scenFolder = _scenariofolder_ or ""
     if scenFolder ~= "" and not scenFolder:match("[\\/]$") then
         scenFolder = scenFolder .. "\\"
     end
@@ -1094,11 +1105,23 @@ function CTFS.ProcessOrder(selections)
             local unitName = item.name
             if item.qty > 1 then unitName = unitName .. " #" .. i end
 
-            -- Standing Task Force baseline ships (except Falklands forward presence) spawn at FLEET_SPAWN1.
-            -- HMS Medway spawns at FLEET_FALKLANDS.
-            -- Purchased ships spawn at their designated authentic naval base RP (with graceful fallback).
-            local targetRP = (item.isDefault and item.name ~= "HMS Medway") and "FLEET_SPAWN1" or item.spawnRP
-            local lat, lon = ResolveSpawnCoords(targetRP, "FLEET_SPAWN1")
+            -- Target Reference Point resolution:
+            -- - HMS Medway spawns at FLEET_FALKLANDS (forward presence)
+            -- - RFA Lyme Bay spawns at FLEET_SPAWN2 (Amphibious Assault Group)
+            -- - Baseline CSG combatants & tankers spawn at FLEET_SPAWN1
+            -- - Purchased ships spawn at their designated authentic naval base RP
+            local targetRP = item.spawnRP or "FLEET_SPAWN1"
+            if item.isDefault then
+                if item.name == "HMS Medway" then
+                    targetRP = "FLEET_FALKLANDS"
+                elseif item.name == "RFA Lyme Bay" then
+                    targetRP = "FLEET_SPAWN2"
+                else
+                    targetRP = "FLEET_SPAWN1"
+                end
+            end
+            local fallbackRP = (targetRP == "FLEET_SPAWN2") and "FLEET_SPAWN2" or "FLEET_SPAWN1"
+            local lat, lon = ResolveSpawnCoords(targetRP, fallbackRP)
 
             local newUnit = ScenEdit_AddUnit({
                 type = item.type,
@@ -1113,10 +1136,13 @@ function CTFS.ProcessOrder(selections)
                 spawnedUnits[unitName] = newUnit.guid
                 spawnedUnits[item.name] = newUnit.guid
 
-                -- 5a. Form Baseline Fleet into "Standing Task Force" Group (excluding forward Falklands assets)
+                -- 5a. Form Baseline Fleet Groups (excluding forward Falklands assets)
+                -- RFA Lyme Bay forms "Amphibious Assault Group" at FLEET_SPAWN2
+                -- CSG capital units form "Standing Task Force" at FLEET_SPAWN1
                 if item.isDefault and item.type == "Ship" and item.name ~= "HMS Medway" then
+                    local groupName = (item.name == "RFA Lyme Bay") and "Amphibious Assault Group" or "Standing Task Force"
                     pcall(function()
-                        ScenEdit_SetUnit({ guid = newUnit.guid, group = "Standing Task Force" })
+                        ScenEdit_SetUnit({ guid = newUnit.guid, group = groupName })
                     end)
                 end
 
@@ -2265,7 +2291,7 @@ CTFS.HTML_TEMPLATE = [==[
                     { id: "QE", type: "Ship", dbid: 1008, name: "HMS Queen Elizabeth", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Carrier Strike Group (CSG) Flagship", upgradeCost: 4 },
                     { id: "StAlbans", type: "Ship", dbid: 3199, name: "HMS St Albans", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 23 ASW Frigate (1x Merlin & 2x Peregrine)", upgradeCost: 2 },
                     { id: "Daring", type: "Ship", dbid: 3200, name: "HMS Daring", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Type 45 Destroyer (1x Wildcat & 2x Peregrine)", upgradeCost: 2 },
-                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
+                    { id: "LymeBay", type: "Ship", dbid: 1451, name: "RFA Lyme Bay", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN2", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Bay-class Landing Ship — Cargo: Battalion Heavy Equipment & Stores (Embarked: 1x Chinook & 4x Puma UAV)" },
                     { id: "Tideforce", type: "Ship", dbid: 2581, name: "RFA Tideforce", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_SPAWN1", category: "default", group: "Task Force Warships & Surface Auxiliaries", role: "Tide-class Tanker — Embarked: 1x Wildcat & 2x Malloy T150" },
                     { id: "Medway", type: "Ship", dbid: 2805, name: "HMS Medway", isDefault: true, pts: 0, qty: 1, spawnRP: "FLEET_FALKLANDS", category: "default", group: "Falklands Forward Patrol Asset", role: "River-class Batch 2 OPV (Falklands Forward Patrol) — Embarked: 2x Peregrine UAV" },
 
@@ -2917,8 +2943,8 @@ local function PrepareHTMLPayload()
         local diagHeader = "=== CTFS File Resolution Diagnostics ===\n"
             .. "type(io): " .. tostring(type(io)) .. "\n"
             .. "type(io.open): " .. tostring(io and type(io.open) or "N/A") .. "\n"
-            .. "_scenariofolder_: " .. tostring(rawget(_G, "_scenariofolder_") or "<empty/nil>") .. "\n"
-            .. "_scriptfolder_: " .. tostring(rawget(_G, "_scriptfolder_") or "<empty/nil>") .. "\n\n"
+            .. "_scenariofolder_: " .. tostring(_scenariofolder_ or "<empty/nil>") .. "\n"
+            .. "_scriptfolder_: " .. tostring(_scriptfolder_ or "<empty/nil>") .. "\n\n"
             .. "Attempted Paths (" .. tostring(#debugLog) .. "):\n"
             .. table.concat(debugLog, "\n")
 
@@ -2927,8 +2953,13 @@ local function PrepareHTMLPayload()
         return nil
     end
 
-    -- Serialize master model
+    -- Dynamically evaluate developer mode from KVS
+    CTFS.DEBUG_MODE = IsDevMode()
     CTFS.MODEL.debugMode = CTFS.DEBUG_MODE
+    if CTFS.DEBUG_MODE then
+        print(string.format("[CTFS DEBUG] Building dialog HTML. Total Budget: %d pts (%d hrs). DevMode: %s (FALKL_DEV_MODE=%s)",
+            CTFS.MaxPoints, CTFS.MaxPoints * CTFS.HoursPerPoint, tostring(CTFS.DEBUG_MODE), tostring(ScenEdit_GetKeyValue("FALKL_DEV_MODE"))))
+    end
     local model_json = JSON.stringify(CTFS.MODEL)
 
     -- Safe injection: Escape CSS percentages while preserving value="%s" slot

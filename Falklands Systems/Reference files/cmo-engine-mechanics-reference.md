@@ -435,9 +435,209 @@ When running automated unit tests for CMO Lua scripts on Windows outside the gam
   $lua = [Activator]::CreateInstance([NLua.Lua], @($true))
   ```
 
+### 11.7 WebView2 Media Integration: Images, Video, and Chromium Sandbox Limitations
+
+When rendering custom HTML interfaces with images or videos via `UI_CallAdvancedHTMLDialog`:
+
+1. **`NavigateToString` Security Boundary (`file:///` Sandboxing)**:
+   - `Command.AdvancedDialog` renders HTML by passing raw strings to WebView2 via `CoreWebView2.NavigateToString(html)`.
+   - Chromium assigns an opaque / `data:` origin to `NavigateToString`.
+   - **Chromium strictly prohibits loading local file subresources (`file:///...`) from opaque/data origins** (`Not allowed to load local resource`).
+   - Consequently, referencing `<img src="file:///...">` or `<video src="file:///...">` will silently fail or show broken media icons.
+
+2. **The 2 MB Maximum String Limit on `NavigateToString`**:
+   - WebView2's COM/WinRT interface enforces a strict hard ceiling of **2 MB (2,097,152 characters)** on the string argument passed to `NavigateToString`.
+   - Passing an HTML payload larger than 2 MB throws:
+     `System.ArgumentException: Value does not fall within the expected range`
+     and causes the dialog window to crash or fail to open.
+
+3. **Image Inlining Best Practice (Web-Optimization & Base64 Data URIs)**:
+   - Full-resolution raw images (e.g., 2800x1500 camera frames at 2.5MB - 5MB) cannot be inlined as Base64 because they exceed the 2MB `NavigateToString` limit.
+   - **Solution**: Downscale images to max 720px width with 80% JPEG quality (~60 KB - 80 KB).
+   - Inlined as Base64 (`data:image/jpeg;base64,...`), the payload is ~80 KB - 110 KB. This is:
+     - 100% offline (no internet connection required).
+     - Immune to Chromium `file:///` sandbox restrictions.
+     - Well below the 2MB WebView2 payload ceiling.
+     - Fast and responsive inside the modal dialog.
+
+4. **Video Handling: HTML Modal vs CMO Native Player**:
+   - **Local Video in HTML Modal**: **Impossible**. Local MP4 files (typically 5MB - 50MB+) cannot be inlined via Base64 (violates 2MB limit) and cannot be loaded via `file:///` (blocked by Chromium sandbox).
+   - **Online Video in HTML Modal (Recommended)**: Edge WebView2 supports HTTPS embeds.
+     - **YouTube**: Use `<iframe src="https://www.youtube.com/embed/{VIDEO_ID}" allowfullscreen></iframe>`. Provides adaptive bitrates, responsive scaling, and zero Google Drive quota lockouts.
+     - **Google Drive**: Use `<iframe src="https://drive.google.com/file/d/{FILE_ID}/preview" allow="autoplay"></iframe>`.
+   - **Offline Local Video (CMO Native Engine)**: CMO has a dedicated native video overlay player:
+     ```lua
+     ScenEdit_PlayVideo("Attachments/EVT12.mp4", false, 0)
+     -- or via Scenario Attachments:
+     ScenEdit_UseAttachment("EVT12.mp4")
+     ```
+     This launches CMO's DirectShow/Windows Media Player overlay directly in-game, functioning 100% offline with local `.mp4` files.
+
+
+## 13. Random Event Engine (REE) Mechanics & Long-Scenario Dynamic Event Architecture
+
+Managing dynamic random events across long scenarios (e.g., 30 days / 720 hours) in CMO requires careful state isolation, time tracking, and event gating.
+
+### 13.1 Non-Repeating State Management in CMO KVS
+CMO does not provide persistent custom globals across engine restarts or save/load boundaries outside of the Key-Value Store (KVS).
+To ensure an event never fires more than once:
+1. Assign every event a unique immutable string ID (e.g. `EVT_01`, `EVT_02`).
+2. Upon execution, record both an individual flag and an audit string:
+   ```lua
+   ScenEdit_SetKeyValue("REE_EVENT_USED_" .. selected.id, "true")
+   local usedList = ScenEdit_GetKeyValue("REE_EXECUTED_EVENTS") or ""
+   ScenEdit_SetKeyValue("REE_EXECUTED_EVENTS", usedList == "" and selected.id or (usedList .. "," .. selected.id))
+   ```
+3. Candidate queries must check `ScenEdit_GetKeyValue("REE_EVENT_USED_" .. evt.id) == "true"` before qualifying any event.
+
+### 13.2 Progressive Milestone Tier Unlocking
+Rather than static time-based event schedules, expeditionary campaigns require gating event pools behind operational milestones:
+```lua
+local function IsMilestoneActive(keyName)
+    local val = ScenEdit_GetKeyValue(keyName)
+    if val == "true" or val == "True" or val == "1" then return true end
+    return false
+end
+```
+When key milestone triggers occur (e.g., fleet arriving at Ascension Island or entering the Falkland Approaches), scenario events set their corresponding KVS flag to `"true"`. The REE master ticker automatically evaluates active tiers on every tick and expands the candidate pool dynamically.
+
+### 13.3 Communications Manipulation (`outofcomms`)
+CMO provides an `outofcomms` property to simulate units losing connection with side tactical networks:
+- **Set out of comms**: `ScenEdit_SetUnit({ guid = unitGuid, outofcomms = true })`
+- **Restore comms**: `ScenEdit_SetUnit({ guid = unitGuid, outofcomms = false })`
+- **Visual & Tactical Impact**: The unit remains physically in the world, but drops off the player's networked tactical picture. Friendly sensors aboard the unit stop sharing contacts with the side until comms are restored.
+- **Rendezvous Detection**: Ongoing tickers can check proximity via `Tool_Range(unitGuid, escortGuid) <= 0.25` NM to automatically restore comms when visual or UHF contact is established.
+
+### 13.4 Timed Mechanical Failures & Repair Handlers
+Component casualties and speed restrictions can be scheduled with future completion hours stored in KVS:
+```lua
+-- Apply component damage and schedule repair completion
+ScenEdit_SetUnitDamage({ guid = shipGuid, components = { {'rudder', 'Medium'} } })
+ScenEdit_SetKeyValue("REE_Timer_EngineFixHour", tostring(currentHour + 4))
+
+-- Ticker checks each hour:
+local fixHour = tonumber(ScenEdit_GetKeyValue("REE_Timer_EngineFixHour")) or -1
+if fixHour > 0 and currentHour >= fixHour then
+    ScenEdit_SetUnitDamage({ guid = shipGuid, components = { {'rudder', 'none'} } })
+    ScenEdit_SetKeyValue("REE_Timer_EngineFixHour", "-1")
+end
+```
+
+### 13.5 Organic Daily Two-Slot Scheduling
+To distribute 0–2 events per day without predictable trigger intervals:
+1. Divide each 24-hour day into two 12-hour slots (00:00–12:00 and 12:00–24:00).
+2. At the beginning of each day, roll an independent 50% probability for each slot.
+3. If a slot triggers, select a randomized hour offset within that slot's range:
+   - Slot 1: `baseHour + math.random(1, 12)`
+   - Slot 2: `baseHour + math.random(13, 24)`
+4. This yields an average of 1.0 event/day (25% chance of 0, 50% chance of 1, 25% chance of 2) while keeping the exact trigger hour organic and unpredictable.
+
 ---
 
-## 12. Summary Cheat Sheet for CMO Scenario Developers
+## 14. Reference Points API & Retrieval Mechanics
+
+### Failure Mode: `ScenEdit_GetReferencePoints({ side = "..." })`
+Calling `ScenEdit_GetReferencePoints({ side = "SideName" })` without specifying `area`, `name`, or `guid` triggers a fatal Lua engine error:
+```text
+Function:ScenEdit_GetReferencePoints (0) Error:Need to define a Side and Name to modify an RP. Or a Side and Guid. Or a set of RPs
+```
+**Cause:** In the CMO core C# engine, `ScenEdit_GetReferencePoints` shares parameter validation with RP modification logic. The engine strictly requires at least one selector beyond side:
+1. `name` (string)
+2. `guid` (string)
+3. `area` (array of RP names or GUIDs, e.g. `area = { "RP-1", "RP-2" }`)
+
+It **cannot** be used to retrieve all reference points for a side.
+
+### The Correct Method: `VP_GetSide({ side = "..." }).rps`
+To retrieve all reference points belonging to a side, use the `rps` property on the `CMO__Side` wrapper returned by `VP_GetSide()`:
+```lua
+local sideObj = VP_GetSide({ side = "UK" })
+if sideObj and sideObj.rps then
+    for _, rp in ipairs(sideObj.rps) do
+        -- rp is a CMO__ReferencePoint wrapper:
+        -- rp.name, rp.guid, rp.latitude, rp.longitude, rp.highlighted
+        print(string.format("RP: %s (GUID: %s) at Lat: %f, Lon: %f", rp.name, rp.guid, rp.latitude, rp.longitude))
+    end
+end
+```
+
+### Reference Point Modification & Area Queries
+- **Get Single RP:** `ScenEdit_GetReferencePoint({ side = "UK", name = "RP_NAME" })` or `{ guid = "..." }`
+- **Set/Update RP:** `ScenEdit_SetReferencePoint({ side = "UK", guid = rp.guid, newname = "NEW_NAME", highlighted = true })`
+- **Units in Polygon Area:** `sideObj:unitsInArea({ Area = { "RP_1", "RP_2", "RP_3" } })`
+
+---
+
+## 15. Dynamic Relative Task Events & Avoiding Duplicate Popups
+
+### 15.1 Relative Reference Points Around Moving Vessels
+To create a task zone (e.g., for comms restoration, boarding, or SAR) that moves synchronously with a vessel across the ocean:
+```lua
+local rpNames = { "RP_1", "RP_2", "RP_3", "RP_4" }
+local bearings = { 45, 135, 225, 315 }
+for i = 1, 4 do
+    ScenEdit_AddReferencePoint({
+        side = "UK",
+        name = rpNames[i],
+        relativeTo = targetUnitGuid,
+        bearing = bearings[i],
+        distance = 0.5, -- NM
+        bearingType = 0, -- 0 = Fixed to true North, 1 = Rotating with heading
+        highlighted = false
+    })
+end
+```
+*Setting `bearingType = 0` locks the relative coordinates to true North, creating a stable square bounding box around the moving ship.*
+
+### 15.2 On-the-Fly Event Creation (`UnitEntersArea`)
+When an objective expects player intervention, generating a dynamic CMO Event provides instant, real-time resolution the second a player's asset enters the zone:
+```lua
+ScenEdit_SetTrigger({
+    mode = "add",
+    name = trigName,
+    description = trigName,
+    type = "UnitEntersArea",
+    TargetFilter = { TargetSide = "UK" },
+    Area = rpNames,
+    ExitArea = false
+})
+
+ScenEdit_SetAction({
+    mode = "add",
+    name = actName,
+    description = actName,
+    type = "LuaScript",
+    ScriptText = actionLuaCode
+})
+
+ScenEdit_SetEvent(evtName, {
+    mode = "add",
+    description = evtName,
+    isRepeatable = false,
+    isActive = true,
+    isShown = false
+})
+ScenEdit_SetEventTrigger(evtName, { mode = "add", name = trigName, description = trigName })
+ScenEdit_SetEventAction(evtName, { mode = "add", name = actName, description = actName })
+```
+
+### 15.3 Dynamic Cleanup Inside the Triggered Action
+The action script must clean up the reference points and deregister the temporary event/trigger/action:
+```lua
+for _, rpName in ipairs(rpList) do
+    pcall(function() ScenEdit_DeleteReferencePoint({ side = "UK", name = rpName }) end)
+end
+pcall(function() ScenEdit_SetEvent(evtName, { mode = "remove" }) end)
+pcall(function() ScenEdit_SetTrigger({ mode = "remove", name = trigName, description = trigName }) end)
+pcall(function() ScenEdit_SetAction({ mode = "remove", name = actName, description = actName }) end)
+```
+
+### 15.4 Avoiding Duplicate Popup Windows
+If a script calls both `UI_CallAdvancedHTMLDialog` and `ScenEdit_SpecialMessage`, CMO displays **two** windows: the rich HTML dialog and an unformatted raw message box. Dropping `ScenEdit_SpecialMessage` when using `UI_CallAdvancedHTMLDialog` leaves only the single styled HTML modal.
+
+---
+
+## 16. Summary Cheat Sheet for CMO Scenario Developers
 
 1. **Always check `Multiple` on VLS weapons**: Quadpack weapons (CAMM, ESSM) have `Multiple = 4`. `MaxLoad = Cells * Multiple`.
 2. **`ScenEdit_AddReloadsToUnit` removes/adds CELLS, not missiles**: Always divide desired missile count by `Multiple` before specifying `number`.
@@ -447,5 +647,109 @@ When running automated unit tests for CMO Lua scripts on Windows outside the gam
 6. **Magazines use individual weapon units**: `ScenEdit_AddWeaponToUnitMagazine` operates on raw weapon quantities, unlike VLS mounts.
 7. **For guaranteed popup dialogs, use `UI_CallAdvancedHTMLDialog`**: `ScenEdit_SpecialMessage` defaults to the message log stream unless user options force popups.
 8. **Always include full `<!DOCTYPE html><html lang="en">` wrappers**: CMO will not parse raw `<div>` snippets as HTML.
+9. **Use `outofcomms = true/false` for communication outages**: Safely drops units from tactical network without deleting or corrupting unit records.
+10. **Store non-repeating event IDs in KVS**: Zero-reoccurrence logic across multi-day campaigns should be tracked through `REE_EVENT_USED_<id>`.
+11. **Always version script headers**: Every scenario script created or modified must include a version tag in its header comment (`-- SCRIPT <N>: <NAME> v1 --`), incrementing (`v1 -> v2 -> v3`) on every edit.
+12. **Retrieve all side RPs via `VP_GetSide({side="Side"}).rps`**: Never call `ScenEdit_GetReferencePoints({ side = "..." })` without an `area` table; access `sideObj.rps` instead.
+14. **Bind relative task zones with `bearingType = 0`**: Dynamic task boxes created relative to moving ships should use `bearingType = 0` to maintain true-North box alignment as the unit changes heading.
+15. **Never use `rawget`, `rawset`, or `rawequal`**: CMO's NLua sandbox strips these from `_G`. Directly access globals (`if VAR == nil then ... end`).
+16. **Scenario files (`.scen`) embed script code inline**: CMO scenario events execute `<ScriptText>` stored inside the scenario file. Updating files on disk does not update active scenario events until re-imported or repasted into CMO's Event Action editor.
 
+---
 
+## 17. CMO Lua Sandbox Quirks & Runtime Constraints
+
+### 17.1 Stripped Metatable Functions (`rawget`, `rawset`, `rawequal`)
+In the CMO sandboxed runtime (`Command_Core.Lua.LuaSandBox`), several standard Lua base functions are removed for security and isolation:
+- `rawget` is **`nil`**
+- `rawset` is **`nil`**
+- `rawequal` is **`nil`**
+
+Attempting to invoke `rawget(_G, "FOO")` throws a runtime exception:
+```
+Exception: [string "CachedChunk"]:41: attempt to call a nil value (global 'rawget')
+Stack Trace:    at NLua.Lua.ThrowExceptionFromError(Int32 oldTop)
+   at Command_Core.LuaUtility.DoString_Optimized(Lua lua, String chunk, String chunkName)
+   at Command_Core.Lua.LuaSandBox.RunScript(String str, Boolean RunInteractively, String script, String fullPath)
+```
+
+**Safe Global Variable Access Pattern**:
+```lua
+-- WRONG (Crashes engine with nil value error):
+if not rawget(_G, "MY_GLOBAL") then ... end
+
+-- CORRECT (Safe across all CMO builds and standard Lua):
+if MY_GLOBAL == nil then ... end
+-- OR:
+if _G["MY_GLOBAL"] == nil then ... end
+```
+
+### 17.2 Scenario Architecture: Inline `<ScriptText>` Execution
+CMO scenarios (`.scen`) store all event actions inline inside their compressed XML structure:
+```xml
+<EventAction_LuaScript>
+    <ID>W8V2DT-0HNOOC3A0PKDB</ID>
+    <Description>REE master-ticker.lua</Description>
+    <ScriptText>-- Entire script content is embedded here --</ScriptText>
+</EventAction_LuaScript>
+```
+**Key Implication for Development**:
+Editing a file under `Development\Global\Falklands Systems\` updates the source code on disk, but does **not** automatically update a scenario currently loaded or saved in CMO unless:
+1. The script is repasted into **Editor -> Event Manager -> Actions -> Edit Script**, OR
+2. The scenario event action is designed as a small runner calling `ScenEdit_RunScript("Development\\...\\script.lua")`.
+If old event actions remain in the scenario, errors like `ScenEdit_GetReferencePoints({ side = "..." })` will continue to trigger even after being resolved in repository files.
+
+### 17.3 Non-Existent API: `ScenEdit_Print`
+In CMO's Lua environment, there is no function named `ScenEdit_Print`. Calling `ScenEdit_Print(...)` throws:
+```
+Lua script execution error: [string "CachedChunk"]: attempt to call a nil value (global 'ScenEdit_Print')
+```
+Always use standard Lua `print(...)` to log text to the scenario log and Lua console.
+
+---
+
+## 18. Global Developer Mode Architecture (`FALKL_DEV_MODE`)
+
+### 18.1 Master Architecture & KVS Specification
+To facilitate rapid scenario balance testing without impacting player immersion on release, all scenario subsystems are bound to a unified Key-Value flag:
+* **Key:** `FALKL_DEV_MODE`
+* **Default During Development:** `"true"`
+* **Release Setting:** `"false"`
+
+**Standard Detection Pattern**:
+```lua
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true -- Defaults to active if uninitialized
+end
+```
+
+### 18.2 Subsystem Behaviors in Developer Mode
+
+| Subsystem | Dev Mode Behavior (`FALKL_DEV_MODE = true`) | Production Release Behavior (`FALKL_DEV_MODE = false`) |
+|---|---|---|
+| **CTFS (Carrier Task Force Selector)** | Un-redacts points budget, displays exact hour delays, shows full threat matrix. Emits `[CTFS DEBUG]` initialization logs. | Redacts points budget and threat details; maintains classified immersion. |
+| **GCE (Ground Control Engine)** | Dumps full tactical telemetry table every hour tick: all 11 zones with base power, modifiers (ISR, CAS, NGFS, Morale, Tether), effective power deltas, shift %, and victory thresholds. | Silent background loop. Only triggers game popups on strategic victory or base flips. |
+| **GCE Consumption** | Prints unit-by-unit infiltration log (`[+] INFILTRATED: <Unit> -> +<N> PWR`) and map deletions. | Silent background processing. |
+| **GCE AI Director** | Logs mainland reinforcement air-bridge drops to Western zones and defensive power diversions from Stanley. | Silent background processing. |
+| **UK Loss Tracker** | Logs unit destruction category, penalty points assessed, and percentage toward withdrawal threshold. | Silent unless political casualty threshold is breached. |
+| **REE (Random Event Engine)** | Exposes detailed candidate pool analysis, unlocks hourly testing modes (`REE_DEV_FORCE_EVENT_HOURLY`), and provides sequential event verification. | Two-slot randomized scheduling with zero debug log clutter. |
+
+### 18.3 REE Developer Testing Flags & Test Suite
+Scenario designers can manipulate REE behavior directly in the CMO Lua Console:
+* **Force Event Every Hour:** `ScenEdit_SetKeyValue("REE_DEV_FORCE_EVENT_HOURLY", "true")`
+* **Cycle All Events Sequentially (EVT_01 -> EVT_29):** `ScenEdit_SetKeyValue("REE_DEV_FORCE_SEQUENTIAL", "true")`
+* **Clear Event Lockout History:** `ScenEdit_SetKeyValue("REE_EXECUTED_EVENTS", "")`
+* **Interactive Test Runner:** Run `ree-test-runner.lua` to dump telemetry and trigger specific events on demand.
+
+### 18.4 How to Toggle for Release
+Prior to publishing or distributing the scenario:
+```lua
+ScenEdit_SetKeyValue("FALKL_DEV_MODE", "false")
+ScenEdit_SetKeyValue("REE_DEV_FORCE_EVENT_HOURLY", "false")
+ScenEdit_SetKeyValue("REE_DEV_FORCE_SEQUENTIAL", "false")
+```
+All debug console prints and un-redacted developer UI panels instantly deactivate.

@@ -77,8 +77,8 @@ The CTFS dynamically generates or references specific map elements for task forc
 
 ### Dynamic Staging Reference Points (UK Side)
 * `FLEET_SPAWN1`: Primary Carrier Strike Group (CSG) spawn location.
-* `FLEET_SPAWN2`: Advance Escort Task Group spawn location.
-* `FLEET_SPAWN3`: Support & Amphibious Task Group spawn location.
+* `FLEET_SPAWN2`: Amphibious Assault Group spawn location (RFA Lyme Bay & embarked assets).
+* `FLEET_SPAWN3`: Support & Logistics Task Group spawn location.
 * `FLEET_SPAWN4`: Forward Submarine & ASW Screen spawn location.
 * `FLEET_SPAWN5`: STUFT / Merchant Logistic Convoy spawn location.
 * `BASE_ASCENSION`: Staging location for forward-deployed aircraft.

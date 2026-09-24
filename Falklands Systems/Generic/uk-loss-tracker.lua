@@ -1,7 +1,7 @@
 
--- ===========
+-- ==============================================================================
 -- FALKLANDS 2027: GENERAL SCRIPT
--- SCRIPT 6: UK LOSS TRACKER & FAIL STATE
+-- SCRIPT 6: UK LOSS TRACKER & FAIL STATE v3
 -- ==============================================================================
 -- README & IMPLEMENTATION GUIDE
 --
@@ -15,13 +15,22 @@
 -- 2. Action: Lua Script Action (paste this entire block).
 -- ==============================================================================
 
+local function IsDevMode()
+    local val = ScenEdit_GetKeyValue("FALKL_DEV_MODE")
+    if val == "false" or val == "0" or val == "FALSE" then
+        return false
+    end
+    return true
+end
+
 function GCE_ProcessUKLoss()
     -- Set the political breaking point (Adjust based on playtesting)
-    local lossThreshold = 250 
+    local lossThreshold = 250
+    local devMode = IsDevMode()
 
     -- Catch the specific unit that was just destroyed
     local deadUnit = ScenEdit_UnitX()
-    
+
     if deadUnit ~= nil then
         local penalty = 0
         
@@ -68,17 +77,23 @@ function GCE_ProcessUKLoss()
             currentLosses = currentLosses + penalty
             ScenEdit_SetKeyValue("GCE_LOSS_SCORE_UK", currentLosses)
             
+            local pct = (currentLosses / lossThreshold) * 100
+            if devMode then
+                print(string.format("[UK LOSS TRACKER DEBUG] Unit Destroyed: %s (Type: %s, Subtype: %s) | Penalty: +%d pts | Loss Score: %d / %d (%.1f%% towards strategic withdrawal threshold)",
+                    deadUnit.name, deadUnit.type or "Unknown", deadUnit.subtype or "Unknown", penalty, currentLosses, lossThreshold, pct))
+            end
+
             -- CHECK THE FAIL STATE
             if currentLosses >= lossThreshold then
                 local msg = string.format("<body bgcolor='#121212' text='#FF5A5F' style='font-family: Arial, sans-serif;'><h2>CATASTROPHIC LOSSES</h2><p>The destruction of <b>%s</b> has pushed UK casualties past the threshold of political acceptability.</p><p>With %d penalty points accumulated, the Government has ordered the immediate withdrawal of the Task Force.</p><h3>STRATEGIC DEFEAT</h3></body>", deadUnit.name, currentLosses)
-                
+
                 ScenEdit_SpecialMessage("UK", msg)
-                
+
                 -- Force the scenario to end immediately
                 ScenEdit_EndScenario()
             else
                 -- Optional: Give the player a warning ping in the message log so they know they are bleeding points
-                ScenEdit_Print(string.format("POLITICAL COMMAND ALERT: Loss of %s has cost %d political points. Current Loss Score: %d / %d", deadUnit.name, penalty, currentLosses, lossThreshold))
+                print(string.format("POLITICAL COMMAND ALERT: Loss of %s has cost %d political points. Current Loss Score: %d / %d", deadUnit.name, penalty, currentLosses, lossThreshold))
             end
         end
     end
